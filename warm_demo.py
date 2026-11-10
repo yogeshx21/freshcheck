@@ -1,7 +1,7 @@
 """Demo se pehle ek baar chalao: 5 demo buttons + 1 compare ko pehle se chala deta hai,
 taaki unke results cache mein save ho jayein aur demo ke time turant khulein.
 
-Pehle FreshCheck server (uvicorn) aur Bifrost chalu hone chahiye.
+Pehle FreshCheck server (uvicorn) aur configured LLM provider chalu hone chahiye; Bifrost tabhi zaroori hai jab usi ko configure kiya ho.
 Chalao:   py warm_demo.py
 """
 import sys, time
@@ -37,9 +37,9 @@ def main():
     except Exception:
         print("FreshCheck server nahi mila. Pehle: py -m uvicorn server:app --reload")
         sys.exit(1)
-    print(f"Gateway: {h['gateway']}  online={h['gateway_ok']}  model={h['model']}")
+    print(f"Gateway: {h['gateway']}  endpoint_reachable={h['gateway_ok']}  model={h['model']}")
     if not h["gateway_ok"]:
-        print("Gateway offline hai. Bifrost wala terminal chalao, phir dobara try karo.")
+        print("Configured LLM endpoint is not reachable at its configured URL.")
         sys.exit(1)
 
     print("\n== 5 demos ==")

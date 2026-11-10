@@ -14,41 +14,55 @@ ANSWER_SYSTEM = "Answer the user's question clearly and concisely in under 150 w
 
 # ---------- helpers ----------
 def norm(s):
-    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", (s or "").lower())).strip()
+    if not isinstance(s, str):
+        return ""
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", s.lower())).strip()
 
 
 def quote_ok(quote, text):
-    """True only if the quote really appears in the source text."""
-    q, t = norm(quote), norm(text)
-    if len(q) < 8:
+    """Return whether normalized quote text appears contiguously in a returned search result."""
+    if not isinstance(quote, str) or not isinstance(text, str):
         return False
-    if q in t:
-        return True
-    qt, ts = q.split(), set(t.split())
-    return len(qt) >= 6 and sum(w in ts for w in qt) / len(qt) >= 0.9
+    q, t = norm(quote), norm(text)
+    return len(q) >= 8 and bool(re.search(r"(?<!\w)" + re.escape(q) + r"(?!\w)", t))
 
 
 OFFICIAL_HOSTS = (
     "python.org", "anthropic.com", "claude.com", "openai.com", "github.com", "mozilla.org",
     "microsoft.com", "google.com", "apple.com", "nodejs.org", "reactjs.org", "react.dev",
 )
+GOV_EDU_SUFFIXES = (
+    ".gov", ".gov.in", ".gov.my", ".gov.uk", ".gov.au", ".gov.sg", ".gov.ca",
+    ".gov.ph", ".gov.nz", ".nic.in", ".edu", ".edu.sg", ".edu.my", ".edu.au", ".ac.uk",
+)
+REFERENCE_HOSTS = ("wikipedia.org", "britannica.com")
 NEWS_HOSTS = (
-    "reuters", "apnews", "bbc", "nytimes", "forbes", "bloomberg", "techcrunch", "theverge",
-    "cnbc", "wsj", "economictimes", "ndtv", "thehindu", "hindustantimes", "livemint", "wired",
+    "reuters.com", "apnews.com", "bbc.com", "bbc.co.uk", "nytimes.com", "forbes.com",
+    "bloomberg.com", "techcrunch.com", "theverge.com", "cnbc.com", "wsj.com",
+    "economictimes.indiatimes.com", "ndtv.com", "thehindu.com", "hindustantimes.com",
+    "livemint.com", "wired.com",
 )
 
 
+def on_domain(host, roots):
+    return any(host == root or host.endswith("." + root) for root in roots)
+
+
 def classify(url):
-    host = (urlparse(url or "").hostname or "").lower()
+    """Heuristic hostname category only; it does not authenticate or endorse page content."""
+    if not isinstance(url, str):
+        return "blog"
+    try:
+        host = (urlparse(url).hostname or "").lower().rstrip(".")
+    except ValueError:
+        return "blog"
     if not host:
         return "blog"
-    if host.endswith(".gov") or ".gov." in host or host.endswith(".edu") or ".nic.in" in host \
-            or host.startswith("docs.") or ".docs." in host or host.startswith("developer.") \
-            or host.startswith("platform.") or any(host == h or host.endswith("." + h) for h in OFFICIAL_HOSTS):
+    if any(host.endswith(suffix) for suffix in GOV_EDU_SUFFIXES) or on_domain(host, OFFICIAL_HOSTS):
         return "official"
-    if "wikipedia.org" in host or "britannica.com" in host:
+    if on_domain(host, REFERENCE_HOSTS):
         return "reference"
-    if any(n in host for n in NEWS_HOSTS):
+    if on_domain(host, NEWS_HOSTS):
         return "news"
     return "blog"
 
@@ -75,18 +89,18 @@ def find_span(answer, exact, claim):
 
 # ---------- verification ----------
 VERIFY = """Today's date is <<TODAY>>.
-You are a strict fact-checker. Decide if the CLAIM is still true today using ONLY the numbered search results below.
+Assess whether the CLAIM is supported, contradicted, or unresolved by ONLY the numbered search-result text below.
+These snippets may be incomplete, outdated, or about a related subject. You have not opened or authenticated the original pages. Do not claim certainty or that a fact is verified.
 
 Rules:
-- If results disagree, trust official documentation and the newest sources.
-- "evidence_quote" MUST be copied EXACTLY (word for word, max 30 words) from ONE result. Never invent or edit a quote.
-- "evidence_source" is the number of the result that the quote came from.
-- Never state a number, version or name in correct_value that does not appear in the results.
-- If the results do not clearly settle it, verdict is "unclear".
-- verdict: "fresh" (still true), "stale" (outdated or no longer true), or "unclear".
-- freshness_score: 0-100 (100 = fully true and current).
-- conflict: true if credible results contradict each other about this fact.
-Write correct_value, reason and conflict_note in the same language as the claim.
+- Treat official documentation and newer dated material as useful evidence, not automatic proof.
+- "evidence_quote" must be a contiguous excerpt copied from ONE result, no more than 30 words. Never invent or combine excerpts.
+- "evidence_source" is the number of the result containing the excerpt.
+- Never invent a number, version or name for correct_value; use an empty string if the results do not support a possible replacement.
+- If the snippets do not clearly support or contradict the claim, verdict is "unclear".
+- verdict "fresh" means these snippets appear to support the claim; "stale" means they appear to contradict it. Neither label certifies truth or currentness.
+- freshness_score is a model suggestion only; the application displays a separate fixed heuristic score, not a probability.
+- Write correct_value, reason and conflict_note in the same language as the claim.
 
 Return ONLY JSON:
 {"verdict":"","freshness_score":0,"correct_value":"","reason":"","evidence_quote":"","evidence_source":1,"conflict":false,"conflict_note":""}
@@ -98,20 +112,49 @@ SEARCH RESULTS:
 """
 
 
+def clean_search_results(raw):
+    """Keep only bounded HTTP(S) search snippets with usable source URLs."""
+    if not isinstance(raw, list):
+        return []
+    cleaned = []
+    for item in raw[:40]:
+        if not isinstance(item, dict):
+            continue
+        url, content = item.get("url"), item.get("content")
+        if not isinstance(url, str) or not isinstance(content, str):
+            continue
+        url, content = url.strip(), content[:20000]
+        if not url or len(url) > 2048:
+            continue
+        try:
+            parsed = urlparse(url)
+            if (parsed.scheme.lower() not in ("http", "https") or not parsed.hostname
+                    or parsed.username is not None or parsed.password is not None
+                    or any(ch.isspace() or ord(ch) < 32 for ch in parsed.netloc)):
+                continue
+            _ = parsed.port  # reject malformed ports before returning a source link
+        except ValueError:
+            continue
+        cleaned.append({"url": url, "content": content})
+        if len(cleaned) >= 8:
+            break
+    return cleaned
+
+
 def gather_results(query, trace=None):
     """Main search + a 'recency probe' (a 2nd search aimed at updates and replacements).
-    Old pages often outrank new ones, so the probe makes sure the NEW fact is in the results."""
-    results = list(search(query, trace))
+    A second query may surface update-related results; neither query guarantees that results are current or relevant."""
+    results = clean_search_results(search(query, trace))
     if RECENCY_PROBE:
         try:
-            probe = search(f"{query} latest update replaced {datetime.date.today().year}", trace)
+            probe = clean_search_results(search(f"{query} latest update replaced {datetime.date.today().year}", trace))
         except Exception:
             probe = []
-        seen = {r.get("url") for r in results}
+        seen = {r["url"] for r in results}
         for r in probe:
-            if r.get("url") not in seen:
+            if r["url"] not in seen:
                 results.append(r)
-                seen.add(r.get("url"))
+                seen.add(r["url"])
     return results[:8]
 
 
@@ -119,8 +162,8 @@ SOURCE_POINTS_FRESH = {"official": 15, "reference": 8, "news": 8, "blog": 0}
 SOURCE_POINTS_STALE = {"official": -12, "reference": -6, "news": -6, "blog": 0}
 
 
-def compute_score(verdict, source_type, verified, conflict):
-    """Explainable 0-100 freshness score. 100 = fully true and current.
+def compute_score(verdict, source_type, quote_matched, conflict):
+    """Fixed heuristic display score (not a probability or truth measure).
     Returns (score, parts) where parts lists every +/- that made the number."""
     parts = []
 
@@ -131,12 +174,12 @@ def compute_score(verdict, source_type, verified, conflict):
     if verdict == "fresh":
         s = add("fresh_base", 70)
         s += add("source_" + source_type, SOURCE_POINTS_FRESH.get(source_type, 0)) if SOURCE_POINTS_FRESH.get(source_type, 0) else 0
-        s += add("proof_verified", 10) if verified else 0
+        s += add("quote_matched", 10) if quote_matched else 0
         s += add("sources_conflict", -25) if conflict else 0
     elif verdict == "stale":
         s = add("stale_base", 20)
         s += add("source_" + source_type, SOURCE_POINTS_STALE.get(source_type, 0)) if SOURCE_POINTS_STALE.get(source_type, 0) else 0
-        s += add("proof_verified", -5) if verified else 0
+        s += add("quote_matched", -5) if quote_matched else 0
         s += add("sources_conflict", 15) if conflict else 0
     else:
         s = add("unclear_base", 35)
@@ -149,7 +192,8 @@ def verify_claim(c, answer, trace=None):
     out = {
         "claim": c["claim"], "exact_text": c.get("exact_text", ""), "type": c.get("type", "other"),
         "search_query": c["search_query"], "verdict": "unclear", "freshness_score": 30,
-        "correct_value": "", "reason": "", "evidence_quote": "", "evidence_verified": False,
+        "correct_value": "", "reason": "", "evidence_quote": "",
+        "evidence_quote_matched": False, "evidence_verified": False,  # legacy alias; text match only
         "source_url": "", "source_type": "blog", "conflict": False, "conflict_note": "",
         "span": find_span(answer, c.get("exact_text", ""), c["claim"]),
         "shelf_days": SHELF_DAYS.get(c.get("type", "other"), 60), "best_before": None,
@@ -177,31 +221,54 @@ def verify_claim(c, answer, trace=None):
         llm_score = max(0, min(100, int(d.get("freshness_score", 30))))
     except Exception:
         llm_score = None
-    quote = d.get("evidence_quote") or ""
+    raw_quote = d.get("evidence_quote")
+    quote = raw_quote.strip() if isinstance(raw_quote, str) else ""
+    if len(quote) > 2000 or len(quote.split()) > 30:
+        quote = ""
     try:
         idx = max(1, min(len(results), int(d.get("evidence_source") or 1)))
     except Exception:
         idx = 1
     src = results[idx - 1] if results else {}
-    verified = bool(results) and quote_ok(quote, src.get("content", ""))
-    if not verified:  # the quote may come from another result
+    quote_matched = bool(results) and quote_ok(quote, src.get("content", ""))
+    if not quote_matched:  # the quote may come from another result
         for r in results:
             if quote_ok(quote, r.get("content", "")):
-                verified, src = True, r
+                quote_matched, src = True, r
                 break
-    if not verified:  # a verdict without proof is never trusted
+    correct_value = d.get("correct_value", "")
+    reason = d.get("reason", "")
+    conflict_value = d.get("conflict")
+    conflict = conflict_value if isinstance(conflict_value, bool) else False
+    conflict_note = d.get("conflict_note", "")
+    if not quote_matched:  # require a bounded text match, not proof of the claim
         verdict = "unclear"
         quote = ""
+        correct_value = ""
+        if results:
+            reason = "No model-supplied excerpt matched the returned search text. Inspect the original sources manually."
+        else:
+            reason = "No search-result text was available to match an excerpt. Inspect the original sources manually."
+        conflict = False
+        conflict_note = ""
+    if not isinstance(correct_value, str):
+        correct_value = ""
+    if not isinstance(reason, str):
+        reason = ""
+    if not isinstance(conflict_note, str):
+        conflict_note = ""
+    correct_value = correct_value[:500]
+    reason = reason[:1200]
+    conflict_note = conflict_note[:500]
     out.update(
-        verdict=verdict, correct_value=d.get("correct_value", ""),
-        reason=d.get("reason", ""), evidence_quote=quote, evidence_verified=verified,
+        verdict=verdict, correct_value=correct_value, reason=reason, evidence_quote=quote,
+        evidence_quote_matched=quote_matched, evidence_verified=quote_matched,  # legacy alias
         source_url=src.get("url") or (results[0].get("url") if results else ""),
-        conflict=bool(d.get("conflict")), conflict_note=d.get("conflict_note", ""),
-        llm_score=llm_score,
+        conflict=conflict, conflict_note=conflict_note, llm_score=llm_score,
     )
     out["source_type"] = classify(out["source_url"])
     out["freshness_score"], out["score_parts"] = compute_score(
-        verdict, out["source_type"], verified, out["conflict"])
+        verdict, out["source_type"], quote_matched, out["conflict"])
     if verdict == "fresh":
         out["best_before"] = (today + datetime.timedelta(days=out["shelf_days"])).isoformat()
     return out
@@ -252,16 +319,15 @@ def check_answer(answer, trace=None):
 
 
 # ---------- feature: fix my answer ----------
-FIX = """Rewrite the AI ANSWER below so that every outdated or unverified fact is corrected,
-using ONLY the VERIFIED FACTS list. Keep the same language, tone and roughly the same length.
-Wrap every corrected or changed fact in double asterisks, like **this**.
-Do not add any fact that is not in the list. If a fact is marked "unverified", soften it
-(for example "may have changed"). Return only the rewritten answer.
+FIX = """Offer a cautious rewrite of the AI ANSWER below using the REVIEW SUGGESTIONS provided.
+The suggestions come from an LLM reviewing search-result snippets; they are not verified facts and the original source pages were not checked.
+Do not present a suggested value as certain or source-confirmed. If a replacement is not well supported in the suggestions, preserve the original with cautious wording or say it needs checking. Keep the same language, tone and roughly the same length.
+Wrap changed wording in double asterisks, like **this**. Return only the rewritten answer.
 
 ANSWER:
 <<ANSWER>>
 
-VERIFIED FACTS:
+REVIEW SUGGESTIONS (not verified):
 <<FACTS>>
 """
 
@@ -304,7 +370,7 @@ SEARCH RESULTS:
 
 
 def fact_history(claim, query, trace=None):
-    results = search(query + " history timeline over time previous changes", trace)
+    results = clean_search_results(search(query + " history timeline over time previous changes", trace))
     block = "\n\n".join(
         f"[{i + 1}] URL: {r.get('url')}\n{(r.get('content') or '')[:900]}"
         for i, r in enumerate(results)

@@ -43,7 +43,7 @@ tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 LOCK = threading.RLock()
 
-# 1 = after the normal search, run a 2nd "recency probe" search (finds replacements/updates).
+# 1 = add a second query aimed at possible updates/replacements; it does not guarantee useful or current results.
 RECENCY_PROBE = os.getenv("RECENCY_PROBE", "1") != "0"
 
 
@@ -53,22 +53,22 @@ def explain_error(e):
     msg = str(e)
     low = msg.lower()
     if name == "APIConnectionError" or "connection error" in low or "connection refused" in low:
-        return (f"{GATEWAY_NAME} se connect nahi hua ({LLM_BASE_URL}). "
-                "Bifrost wala terminal band to nahi hua? Use dobara chalao.")
+        return (f"Could not connect to the configured LLM endpoint ({LLM_BASE_URL}). "
+                "Check that the endpoint is reachable and the configured provider is running.")
     if "virtual_key" in low or "virtual key" in low:
-        return "Bifrost ko virtual key chahiye. .env mein BIFROST_VK=sk-bf-... daalo aur server restart karo."
+        return "The configured gateway requires a virtual key. Check BIFROST_VK in .env and restart the server."
     if name in ("AuthenticationError", "PermissionDeniedError") or "invalid api key" in low:
-        return "API key galat hai ya Bifrost mein Groq key add nahi hui. .env aur Bifrost dashboard check karo."
+        return "The configured LLM provider rejected its API key. Check the provider credentials in .env."
     if name == "NotFoundError" or "does not exist" in low:
-        return f"Model nahi mila. .env mein MODEL badlo (abhi: {MODEL}). Bifrost mein naam 'groq/...' se shuru hota hai."
+        return f"The configured endpoint does not provide model {MODEL!r}. Check MODEL and the provider’s model names."
     if name == "RateLimitError" or "rate limit" in low or "429" in low:
-        return "Groq ka rate limit lag gaya. 1 minute ruko aur dobara try karo."
+        return "The configured LLM provider returned a rate limit. Wait before retrying and check its quota."
     if "usagelimit" in name.lower() or "credit" in low or "plan limit" in low:
-        return "Tavily ke credits khatam ho gaye ya limit lag gayi. app.tavily.com par check karo."
+        return "Tavily reported a usage or plan limit. Check the account’s available search quota."
     if "invalidapikey" in name.lower() or "missingapikey" in name.lower():
-        return "Tavily key galat hai ya missing hai. .env mein TAVILY_API_KEY check karo."
+        return "Tavily rejected or could not find its API key. Check TAVILY_API_KEY in .env."
     if "timeout" in name.lower() or "timed out" in low:
-        return "Request time out ho gayi. Dobara try karo."
+        return "The request timed out. Check the configured service and try again when it is available."
     return f"{name}: {msg[:300]}"
 
 
@@ -122,7 +122,8 @@ def parse_json(text):
     if a < 0 or b < 0:
         return {}
     try:
-        return json.loads(text[a : b + 1])
+        parsed = json.loads(text[a : b + 1])
+        return parsed if isinstance(parsed, dict) else {}
     except Exception:
         return {}
 

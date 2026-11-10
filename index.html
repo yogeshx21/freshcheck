@@ -116,7 +116,7 @@ mark.fx{background:color-mix(in srgb,var(--a) 28%,transparent);border-bottom:2px
 .ev-ok{font-size:12px;color:var(--good);font-weight:700;font-style:normal;margin-top:4px}
 .ev-no{font-size:12px;color:var(--warn);margin-top:8px}
 .sb{display:inline-block;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:800;margin-right:6px;color:#fff}
-.sb-official{background:#16a34a}.sb-reference{background:#7c3aed}.sb-news{background:#0284c7}.sb-blog{background:#6b7280}
+.sb-official{background:#475569}.sb-reference{background:#7c3aed}.sb-news{background:#0284c7}.sb-blog{background:#6b7280}
 .warnc{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:8px;background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--warn);font-size:12px;font-weight:700}
 .cc a{color:var(--a2);font-weight:700;text-decoration:none}
 .stamp{display:inline-block;margin-top:12px;padding:4px 12px;border:3px solid var(--c);color:var(--c);font-weight:900;letter-spacing:1.5px;border-radius:8px;transform:rotate(-6deg);font-size:13px;text-transform:uppercase;animation:slam .5s cubic-bezier(.2,1.6,.4,1) both;animation-delay:var(--d,.5s)}
@@ -152,7 +152,7 @@ mark.fx{background:color-mix(in srgb,var(--a) 28%,transparent);border-bottom:2px
 .mc h4{margin:0;font-size:15px;word-break:break-all}
 .mc .ans{font-size:13px;color:var(--muted);margin:10px 0;line-height:1.5;max-height:110px;overflow:auto}
 .mc .sl{font-size:13px;margin-top:6px;color:var(--bad)}
-.crown{padding:12px 16px;border-radius:12px;background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good);font-weight:800;margin-top:16px}
+.crown{padding:12px 16px;border-radius:12px;background:color-mix(in srgb,var(--a) 12%,transparent);color:var(--a);font-weight:700;margin-top:16px}
 /* dashboard */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
 .kpi{padding:16px;border-radius:16px;border:1px solid var(--border);background:var(--card);text-align:center}
@@ -312,7 +312,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:90}
   <img src="/logo" alt="Visionaries" onerror="this.style.display='none'">
   <div><b>FreshCheck</b> by Visionaries</div>
   <div class="tl">DREAM • INNOVATE • BUILD</div>
-  <div style="margin-top:8px;font-size:13px">Powered by Bifrost + Tavily</div>
+  <div style="margin-top:8px;font-size:13px">Tavily Search · Groq direct or Bifrost (optional)</div>
 </footer>
 
 <script>
@@ -320,142 +320,145 @@ const L={
 en:{name:"English",speech:"en-IN",loc:"en-IN",
 navHome:"Home",navTry:"Try it",navCompare:"Compare models",navDash:"Dashboard",navHow:"How it works",
 mTheme:"Theme",dark:"Dark",light:"Light",mLang:"Language",mSound:"Sound & voice",on:"On",off:"Off",
-heroTitle:"Catch stale AI answers before they mislead you",heroSub:"AI often states old facts with full confidence. FreshCheck verifies every claim on the live web, shows the proof, and fixes the answer.",
-ctaTry:"Try it now",ctaHow:"How it works",b1:"Live web verified",b2:"Proof for every claim",b3:"4 languages",b4:"Voice enabled",
-tryTitle:"Check an answer",trySub:"Ask a question, or paste any AI answer. See which facts went stale.",
-placeholder:"Ask a question, or paste an AI answer to check...",askBtn:"Ask + Check",checkBtn:"Check pasted answer",voiceBtn:"🎙 Voice chat",micBtn:"🎤 Dictate",
+heroTitle:"Review time-sensitive claims in AI answers",heroSub:"FreshCheck uses Tavily result text and an LLM to suggest reviews. It can miss claims or be wrong; check original sources yourself.",
+ctaTry:"Try it now",ctaHow:"How it works",b1:"Tavily results + LLM review",b2:"Suggestions, not proof",b3:"4 languages",b4:"Voice enabled",
+tryTitle:"Review an AI answer",trySub:"Review model suggestions for candidate claims; claims can be missed and suggestions can be wrong.",
+placeholder:"Ask a question, or paste an AI answer to review...",askBtn:"Ask + Review",checkBtn:"Review pasted answer",voiceBtn:"🎙 Voice chat",micBtn:"🎤 Dictate",
 demosLbl:"One-click demos:",d1:"Price trap",d2:"CEO trap",d3:"Version trap",d4:"Law trap (India)",d5:"Tech trap",
-loading:["Reading the answer...","Extracting time-sensitive claims...","Searching the live web...","Checking the proof..."],
-overall:"Overall freshness",claimsChecked:"claims checked",fresh:"FRESH",stale:"STALE",unclear:"UNCLEAR",
-expired:"EXPIRED",bestBefore:"BEST BEFORE",verifyStamp:"VERIFY",
-answerHl:"Answer with highlights",legend:"Red = outdated · Green = current · Amber = unclear. Click a highlight to jump to its card.",
-evidence:"Evidence from source",evOk:"✔ verified inside the source",evNot:"The quote could not be verified in the source, so this is marked unclear.",
-correct:"Correct / current value",why:"Why",source:"Open source",
-src_official:"Official",src_reference:"Reference",src_news:"News",src_blog:"Blog/other",conflict:"Sources disagree",
-speak:"🔊 Read aloud",fix:"✨ Fix my answer",fixing:"Rewriting...",fixedTitle:"Corrected answer",fixedNote:"Highlighted parts were corrected using verified sources.",
+loading:["Reading the answer...","Extracting candidate claims...","Searching result snippets...","Assessing snippets (not original pages)..."],
+overall:"Average heuristic score (not confidence)",claimsChecked:"candidate claims reviewed",fresh:"LLM suggests fresh",stale:"LLM suggests possible contradiction",unclear:"Needs review",
+expired:"Possible staleness",bestBefore:"Recheck estimate:",verifyStamp:"Needs review",
+answerHl:"Answer with highlights",legend:"Colors show LLM suggestions, based on search-result snippets only; check original sources yourself.",
+evidence:"Search-result excerpt",evOk:"Normalized quote matched returned result text only; original page not checked.",evNot:"No normalized quote match in returned search text; review manually.",
+correct:"Suggested replacement (check source)",why:"Why",source:"Open search result",
+src_official:"Listed domain category (heuristic only)",src_reference:"Reference",src_news:"News",src_blog:"Blog/other",conflict:"Sources disagree",
+speak:"🔊 Read aloud",fix:"✨ Suggest a rewrite",fixing:"Rewriting...",fixedTitle:"Cautious rewrite suggestion",fixedNote:"Generated from model suggestions, not verified facts; check sources and edit before using.",
 copy:"📋 Copy",download:"⬇ .txt",share:"🔗 Share link",pdf:"📄 PDF",copied:"Copied!",linkCopied:"Link copied!",
-timeMachine:"🕰 Time machine",tmLoading:"Digging through history...",tmNone:"Not enough history found in the sources.",
-gwTitle:"Gateway live panel",gwSub:"Every step of this check, in order",gwGateway:"Gateway",gwModel:"Model",gwCalls:"LLM calls",gwTokens:"Tokens",gwLive:"Live searches",gwCache:"Cached searches",gwTime:"Total time",gwCached:"Instant result served from cache",
-cmpTitle:"Which AI is the most outdated?",cmpSub:"Ask one question to several models through the gateway and compare how fresh their answers are.",cmpPlaceholder:"e.g. What is the latest Python version and who is Anthropic's CEO?",cmpBtn:"Compare models",cmpLoading:"Asking every model and verifying...",cmpBest:"Freshest model",cmpAnswer:"Answer",cmpErr:"Failed",
-dashTitle:"Dashboard",dashSub:"Which kinds of facts go stale most often?",kChecks:"Checks",kClaims:"Claims",kStale:"Stale found",kSearch:"Live searches",dashEmpty:"No data yet. Run a check first.",staleRate:"stale",
+timeMachine:"Search-result timeline",tmLoading:"Drafting a timeline from search-result snippets...",tmNone:"These snippets didn't support a timeline draft; that doesn't mean no history exists.",tmDisclaimer:"Model-drafted from search snippets only; dates and details may be wrong or incomplete. Open sources and verify.",
+gwTitle:"Request trace",gwSub:"Observed steps for this request",gwGateway:"Gateway",gwModel:"Model",gwCalls:"LLM calls",gwTokens:"Tokens",gwLive:"Live searches",gwCache:"Cached searches",gwTime:"Total time",gwCached:"Result served from cache",
+cmpTitle:"Compare model answers",cmpSub:"Generate answers and apply the same experimental checks; scores are not a reliability ranking, and no model is declared the winner.",cmpPlaceholder:"e.g. What is the latest Python version and who is Anthropic's CEO?",cmpBtn:"Compare models",cmpLoading:"Asking models and calculating heuristic labels...",cmpBest:"Heuristic score only; no winner",cmpAnswer:"Answer",cmpErr:"Failed",
+dashTitle:"Dashboard",dashSub:"Distribution of experimental LLM labels by extracted claim category.",kChecks:"Checks",kClaims:"Claims",kStale:"Possible contradiction suggestions",kSearch:"Live searches",dashEmpty:"No data yet. Run a check first.",staleRate:"suggested contradiction",
 t_pricing:"Pricing",t_version:"Versions",t_leadership:"Leadership",t_law:"Laws",t_stat:"Statistics",t_other:"Other",
-howTitle:"How it works",howSub:"Four steps from answer to proof.",
-s1t:"Ask",s1p:"Ask anything, or paste an AI answer.",s2t:"Extract",s2p:"We pull out facts that change with time, with their exact sentences.",s3t:"Verify",s3p:"Each fact is searched on the live web and the proof line is matched in the source.",s4t:"Fix",s4p:"Freshness score, expiry stamp and a corrected answer.",
+howTitle:"How it works",howSub:"Four steps from answer to review suggestions.",
+s1t:"Ask",s1p:"Ask anything, or paste an AI answer.",s2t:"Extract",s2p:"An LLM extracts up to eight candidate time-sensitive claims; it may miss claims.",s3t:"Review",s3p:"Tavily searches result snippets; an LLM assesses them. Original pages are not opened or authenticated.",s4t:"Rewrite",s4p:"See model-suggested labels and a fixed heuristic score, then draft a cautious rewrite; none is verified.",
 history:"Recent checks",err:"Something went wrong. Is the server running?",empty:"Please type something first.",shared:"Shared report (read-only)",
-say:(n,f,s)=>`${n} claims checked. ${f} fresh and ${s} stale.`,warn:s=>`Warning: ${s} outdated facts found.`,allGood:"All facts are current."},
+say:(n,f,s)=>`${n} candidate claims reviewed: ${f} LLM-suggested supported, ${s} possibly contradicted. Check original sources.`,warn:s=>`${s} claims have LLM-suggested possible contradictions. Check original sources.`,allGood:"No claims were labeled possibly contradicted; that does not establish currentness."},
 hi:{name:"हिंदी",speech:"hi-IN",loc:"hi-IN",
 navHome:"होम",navTry:"आज़माएँ",navCompare:"मॉडल तुलना",navDash:"डैशबोर्ड",navHow:"कैसे काम करता है",
 mTheme:"थीम",dark:"डार्क",light:"लाइट",mLang:"भाषा",mSound:"आवाज़",on:"चालू",off:"बंद",
-heroTitle:"पुराने AI जवाब पकड़ें, गुमराह होने से पहले",heroSub:"AI अक्सर पुरानी जानकारी पूरे भरोसे से बताता है। FreshCheck हर दावे को लाइव वेब पर जाँचता है, सबूत दिखाता है और जवाब सुधार देता है।",
-ctaTry:"अभी आज़माएँ",ctaHow:"कैसे काम करता है",b1:"लाइव वेब से जाँच",b2:"हर दावे का सबूत",b3:"4 भाषाएँ",b4:"आवाज़ सपोर्ट",
-tryTitle:"जवाब जाँचें",trySub:"सवाल पूछें या कोई AI जवाब पेस्ट करें। देखें कौन से तथ्य पुराने हो गए।",
-placeholder:"सवाल पूछें, या जाँचने के लिए AI का जवाब पेस्ट करें...",askBtn:"पूछें + जाँचें",checkBtn:"पेस्ट किया जवाब जाँचें",voiceBtn:"🎙 वॉइस चैट",micBtn:"🎤 बोलकर लिखें",
+heroTitle:"AI जवाबों के समय-संवेदनशील दावों की समीक्षा करें",heroSub:"FreshCheck Tavily शोध-परिणाम और LLM से समीक्षा सुझाव देता है। दावे छूट सकते हैं या सुझाव गलत हो सकते हैं; मूल स्रोत खुद जाँचें।",
+ctaTry:"अभी आज़माएँ",ctaHow:"कैसे काम करता है",b1:"Tavily परिणाम + LLM समीक्षा",b2:"सुझाव, सबूत नहीं",b3:"4 भाषाएँ",b4:"आवाज़ सपोर्ट",
+tryTitle:"AI जवाब की समीक्षा करें",trySub:"संभावित दावों पर मॉडल के सुझाव देखें; दावे छूट सकते हैं और सुझाव गलत हो सकते हैं।",
+placeholder:"सवाल पूछें, या समीक्षा के लिए AI का जवाब पेस्ट करें...",askBtn:"पूछें + समीक्षा करें",checkBtn:"पेस्ट किए जवाब की समीक्षा करें",voiceBtn:"🎙 वॉइस चैट",micBtn:"🎤 बोलकर लिखें",
 demosLbl:"एक-क्लिक डेमो:",d1:"कीमत का जाल",d2:"CEO का जाल",d3:"वर्ज़न का जाल",d4:"कानून का जाल (भारत)",d5:"टेक का जाल",
-loading:["जवाब पढ़ रहे हैं...","बदलने वाले दावे निकाल रहे हैं...","लाइव वेब पर खोज रहे हैं...","सबूत जाँच रहे हैं..."],
-overall:"कुल ताज़गी",claimsChecked:"दावे जाँचे गए",fresh:"ताज़ा",stale:"पुराना",unclear:"अस्पष्ट",
-expired:"एक्सपायर",bestBefore:"मान्य तारीख:",verifyStamp:"जाँचें",
-answerHl:"हाइलाइट के साथ जवाब",legend:"लाल = पुराना · हरा = सही · पीला = अस्पष्ट। हाइलाइट पर क्लिक करके उसके कार्ड पर जाएँ।",
-evidence:"स्रोत से सबूत",evOk:"✔ स्रोत के अंदर पुष्टि हुई",evNot:"सबूत की लाइन स्रोत में नहीं मिली, इसलिए अस्पष्ट मार्क किया।",
-correct:"सही / मौजूदा जानकारी",why:"कारण",source:"स्रोत खोलें",
-src_official:"आधिकारिक",src_reference:"संदर्भ",src_news:"समाचार",src_blog:"ब्लॉग/अन्य",conflict:"स्रोतों में मतभेद",
-speak:"🔊 सुनें",fix:"✨ मेरा जवाब सुधारो",fixing:"दोबारा लिख रहे हैं...",fixedTitle:"सुधारा हुआ जवाब",fixedNote:"हाइलाइट हिस्से जाँचे हुए स्रोतों से सुधारे गए हैं।",
+loading:["जवाब पढ़ रहे हैं...","संभावित दावे निकाल रहे हैं...","खोज-परिणामों में खोज रहे हैं...","स्निपेट का आकलन कर रहे हैं (मूल पेज नहीं)..."],
+overall:"औसत अनुमानित स्कोर (विश्वास-स्तर नहीं)",claimsChecked:"संभावित दावों की समीक्षा",fresh:"LLM को समर्थित लगा",stale:"LLM को विरोधाभासी लगा",unclear:"समीक्षा चाहिए",
+expired:"संभवतः पुराना",bestBefore:"फिर जाँचने का अनुमान:",verifyStamp:"समीक्षा चाहिए",
+answerHl:"हाइलाइट के साथ जवाब",legend:"रंग LLM के सुझाव दिखाते हैं, केवल खोज-परिणाम के पाठ पर; मूल स्रोत खुद जाँचें।",
+evidence:"खोज-परिणाम का अंश",evOk:"सामान्यीकृत उद्धरण केवल खोज-परिणाम के पाठ में मिला; मूल पेज नहीं जाँचा।",evNot:"खोज-परिणाम के पाठ में मेल नहीं मिला; मैन्युअल समीक्षा करें।",
+correct:"सुझाया गया बदलाव (स्रोत जाँचें)",why:"कारण",source:"खोज-परिणाम खोलें",
+src_official:"सूचीबद्ध डोमेन श्रेणी (केवल अनुमान)",src_reference:"संदर्भ",src_news:"समाचार",src_blog:"ब्लॉग/अन्य",conflict:"स्रोतों में मतभेद",
+speak:"🔊 सुनें",fix:"✨ मेरा जवाब सुधारो",fixing:"दोबारा लिख रहे हैं...",fixedTitle:"सावधानी से लिखा जवाब-सुझाव",fixedNote:"मॉडल सुझावों से बना है, सत्यापित तथ्य नहीं; इस्तेमाल से पहले स्रोत जाँचें और संपादित करें।",
 copy:"📋 कॉपी",download:"⬇ .txt",share:"🔗 लिंक शेयर",pdf:"📄 PDF",copied:"कॉपी हो गया!",linkCopied:"लिंक कॉपी हुआ!",
-timeMachine:"🕰 टाइम मशीन",tmLoading:"इतिहास खंगाल रहे हैं...",tmNone:"स्रोतों में पर्याप्त इतिहास नहीं मिला।",
-gwTitle:"गेटवे लाइव पैनल",gwSub:"इस जाँच का हर कदम, क्रम से",gwGateway:"गेटवे",gwModel:"मॉडल",gwCalls:"LLM कॉल",gwTokens:"टोकन",gwLive:"लाइव सर्च",gwCache:"कैश्ड सर्च",gwTime:"कुल समय",gwCached:"कैश से तुरंत नतीजा",
-cmpTitle:"कौन सा AI सबसे पुराना बोलता है?",cmpSub:"एक ही सवाल कई मॉडल से गेटवे के ज़रिए पूछें और ताज़गी की तुलना करें।",cmpPlaceholder:"जैसे: Python का नया वर्ज़न क्या है और Anthropic का CEO कौन है?",cmpBtn:"मॉडल तुलना करें",cmpLoading:"सभी मॉडल से पूछ रहे हैं और जाँच रहे हैं...",cmpBest:"सबसे ताज़ा मॉडल",cmpAnswer:"जवाब",cmpErr:"विफल",
-dashTitle:"डैशबोर्ड",dashSub:"किस तरह के तथ्य सबसे ज़्यादा पुराने होते हैं?",kChecks:"जाँचें",kClaims:"दावे",kStale:"पुराने मिले",kSearch:"लाइव सर्च",dashEmpty:"अभी डेटा नहीं है। पहले एक जाँच चलाएँ।",staleRate:"पुराने",
+timeMachine:"खोज-परिणामों की समयरेखा",tmLoading:"खोज-परिणामों के अंशों से समयरेखा का मसौदा बना रहे हैं...",tmNone:"इन अंशों से समयरेखा का मसौदा नहीं बन पाया; इसका अर्थ यह नहीं कि इतिहास मौजूद नहीं है।",tmDisclaimer:"यह केवल खोज-अंशों से मॉडल द्वारा बनाया गया मसौदा है; तारीखें और विवरण गलत या अधूरे हो सकते हैं। मूल स्रोत जाँचें।",
+gwTitle:"अनुरोध ट्रेस",gwSub:"इस अनुरोध के देखे गए चरण",gwGateway:"गेटवे",gwModel:"मॉडल",gwCalls:"LLM कॉल",gwTokens:"टोकन",gwLive:"लाइव सर्च",gwCache:"कैश्ड सर्च",gwTime:"कुल समय",gwCached:"परिणाम कैश से मिला",
+cmpTitle:"मॉडल जवाबों की तुलना",cmpSub:"जवाब बनाकर एक जैसी प्रयोगात्मक जाँच चलाएँ; स्कोर विश्वसनीयता की रैंकिंग नहीं हैं और कोई विजेता नहीं चुना जाता।",cmpPlaceholder:"जैसे: Python का नया वर्ज़न क्या है और Anthropic का CEO कौन है?",cmpBtn:"मॉडल तुलना करें",cmpLoading:"मॉडल से जवाब लेकर अनुमानित लेबल बना रहे हैं...",cmpBest:"केवल अनुमानित स्कोर; कोई विजेता नहीं",cmpAnswer:"जवाब",cmpErr:"विफल",
+dashTitle:"डैशबोर्ड",dashSub:"निकाले गए दावा-प्रकार के अनुसार प्रयोगात्मक LLM लेबल।",kChecks:"जाँचें",kClaims:"दावे",kStale:"संभव विरोधाभास सुझाव",kSearch:"लाइव सर्च",dashEmpty:"अभी डेटा नहीं है। पहले एक जाँच चलाएँ।",staleRate:"विरोधाभास सुझाव",
 t_pricing:"कीमतें",t_version:"वर्ज़न",t_leadership:"नेतृत्व",t_law:"कानून",t_stat:"आँकड़े",t_other:"अन्य",
-howTitle:"कैसे काम करता है",howSub:"जवाब से सबूत तक चार कदम।",
-s1t:"पूछें",s1p:"कुछ भी पूछें या AI जवाब पेस्ट करें।",s2t:"निकालें",s2p:"समय के साथ बदलने वाले तथ्य और उनके सटीक वाक्य निकाले जाते हैं।",s3t:"जाँचें",s3p:"हर तथ्य को लाइव वेब पर खोजकर सबूत की लाइन स्रोत में मिलाई जाती है।",s4t:"सुधारें",s4p:"ताज़गी स्कोर, एक्सपायरी स्टैम्प और सुधरा हुआ जवाब।",
+howTitle:"How it works",howSub:"जवाब से समीक्षा सुझाव तक चार कदम।",
+s1t:"पूछें",s1p:"कुछ भी पूछें या AI जवाब पेस्ट करें।",s2t:"निकालें",s2p:"LLM अधिकतम आठ समय-संवेदनशील संभावित दावे निकालता है; कुछ छूट सकते हैं।",s3t:"जाँचें",s3p:"Tavily खोज-परिणाम खोजता है; LLM स्निपेट का आकलन करता है। मूल पेज नहीं खुलते या प्रमाणित होते।",s4t:"सुधारें",s4p:"सुझाए गए लेबल और अनुमानित स्कोर देखें—यह फैसला या सत्यापित सुधार नहीं है।",
 history:"हाल की जाँचें",err:"कुछ गड़बड़ हो गई। क्या सर्वर चालू है?",empty:"पहले कुछ लिखें।",shared:"शेयर की गई रिपोर्ट (सिर्फ़ देखने के लिए)",
-say:(n,f,s)=>`${n} दावे जाँचे गए। ${f} ताज़ा और ${s} पुराने।`,warn:s=>`सावधान, ${s} जानकारी पुरानी है।`,allGood:"सारी जानकारी ताज़ा है।"},
+say:(n,f,s)=>`${n} संभावित दावों की समीक्षा: ${f} को LLM ने समर्थित, ${s} को संभवतः विरोधाभासी सुझाया। मूल स्रोत जाँचें।`,warn:s=>`${s} दावों पर LLM ने संभावित विरोधाभास सुझाया है। मूल स्रोत जाँचें।`,allGood:"किसी दावे को संभावित विरोधाभासी नहीं कहा गया; इससे मौजूदा होना साबित नहीं होता।"},
 mr:{name:"मराठी",speech:"mr-IN",loc:"mr-IN",
 navHome:"होम",navTry:"वापरून पहा",navCompare:"मॉडेल तुलना",navDash:"डॅशबोर्ड",navHow:"कसे काम करते",
 mTheme:"थीम",dark:"डार्क",light:"लाइट",mLang:"भाषा",mSound:"आवाज",on:"चालू",off:"बंद",
-heroTitle:"जुनी AI उत्तरे पकडा, दिशाभूल होण्याआधी",heroSub:"AI अनेकदा जुनी माहिती पूर्ण आत्मविश्वासाने सांगतो. FreshCheck प्रत्येक दावा लाइव्ह वेबवर तपासतो, पुरावा दाखवतो आणि उत्तर दुरुस्त करतो.",
-ctaTry:"आत्ताच वापरून पहा",ctaHow:"कसे काम करते",b1:"लाइव्ह वेब तपासणी",b2:"प्रत्येक दाव्याचा पुरावा",b3:"4 भाषा",b4:"आवाज सपोर्ट",
-tryTitle:"उत्तर तपासा",trySub:"प्रश्न विचारा किंवा कोणतेही AI उत्तर पेस्ट करा. कोणती तथ्ये जुनी झाली ते पहा.",
-placeholder:"प्रश्न विचारा, किंवा तपासण्यासाठी AI चे उत्तर पेस्ट करा...",askBtn:"विचारा + तपासा",checkBtn:"पेस्ट केलेले उत्तर तपासा",voiceBtn:"🎙 व्हॉइस चॅट",micBtn:"🎤 बोलून लिहा",
+heroTitle:"AI उत्तरांतील वेळेनुसार बदलू शकणाऱ्या दाव्यांचे पुनरावलोकन करा",heroSub:"FreshCheck Tavily शोध-मजकूर आणि LLM वापरून समीक्षा सुचवतो. काही दावे सुटू किंवा चुकीचे असू शकतात; मूळ स्रोत तपासा.",
+ctaTry:"आत्ताच वापरून पहा",ctaHow:"कसे काम करते",b1:"Tavily शोध-मजकूर + LLM समीक्षा",b2:"सुझाव, पुरावा नाही",b3:"4 भाषा",b4:"आवाज सपोर्ट",
+tryTitle:"AI उत्तराचे पुनरावलोकन करा",trySub:"संभाव्य दाव्यांवरील मॉडेलचे सल्ले पाहा; दावे सुटू शकतात आणि सल्ले चुकीचे असू शकतात.",
+placeholder:"प्रश्न विचारा, किंवा पुनरावलोकनासाठी AI चे उत्तर पेस्ट करा...",askBtn:"विचारा + पुनरावलोकन",checkBtn:"पेस्ट केलेल्या उत्तराचे पुनरावलोकन",voiceBtn:"🎙 व्हॉइस चॅट",micBtn:"🎤 बोलून लिहा",
 demosLbl:"एका क्लिकमध्ये डेमो:",d1:"किमतीचा सापळा",d2:"CEO चा सापळा",d3:"आवृत्तीचा सापळा",d4:"कायद्याचा सापळा (भारत)",d5:"टेक सापळा",
-loading:["उत्तर वाचत आहे...","बदलणारे दावे काढत आहे...","लाइव्ह वेबवर शोधत आहे...","पुरावे तपासत आहे..."],
-overall:"एकूण ताजेपणा",claimsChecked:"दावे तपासले",fresh:"ताजे",stale:"जुने",unclear:"अस्पष्ट",
-expired:"एक्सपायर्ड",bestBefore:"वैध तारीख:",verifyStamp:"तपासा",
-answerHl:"हायलाइटसह उत्तर",legend:"लाल = जुने · हिरवे = बरोबर · पिवळे = अस्पष्ट. हायलाइटवर क्लिक करून त्याच्या कार्डवर जा.",
-evidence:"स्रोतातील पुरावा",evOk:"✔ स्रोतात पडताळले",evNot:"पुराव्याची ओळ स्रोतात सापडली नाही, म्हणून अस्पष्ट चिन्हांकित.",
-correct:"बरोबर / सध्याची माहिती",why:"कारण",source:"स्रोत उघडा",
-src_official:"अधिकृत",src_reference:"संदर्भ",src_news:"बातमी",src_blog:"ब्लॉग/इतर",conflict:"स्रोतांमध्ये मतभेद",
-speak:"🔊 ऐका",fix:"✨ माझे उत्तर दुरुस्त करा",fixing:"पुन्हा लिहित आहे...",fixedTitle:"दुरुस्त केलेले उत्तर",fixedNote:"हायलाइट केलेले भाग पडताळलेल्या स्रोतांनी दुरुस्त केले आहेत.",
+loading:["उत्तर वाचत आहे...","संभाव्य दावे काढत आहे...","शोध-परिणाम शोधत आहे...","स्निपेटचे आकलन करत आहे (मूळ पान नाही)..."],
+overall:"सरासरी अनुमानित गुण (विश्वासाची शक्यता नाही)",claimsChecked:"संभाव्य दाव्यांचे पुनरावलोकन",fresh:"LLM ला समर्थित वाटले",stale:"LLM ला विरोधाभासी वाटले",unclear:"पुनरावलोकन आवश्यक",
+expired:"कदाचित जुने",bestBefore:"पुन्हा तपासण्याचा अंदाज:",verifyStamp:"पुनरावलोकन आवश्यक",
+answerHl:"हायलाइटसह उत्तर",legend:"रंग LLM चे सल्ले दाखवतात—फक्त शोध-परिणामांच्या मजकुरावर; मूळ स्रोत स्वतः तपासा.",
+evidence:"शोध-परिणामातील उतारा",evOk:"सामान्यीकृत उद्धरण शोध-परिणामाच्या मजकुरात जुळले; मूळ पान तपासले नाही.",evNot:"शोध-परिणाम मजकुरात उद्धरण जुळले नाही; हाताने तपासा.",
+correct:"सुचवलेली जागा (स्रोत तपासा)",why:"कारण",source:"शोध परिणाम उघडा",
+src_official:"यादीतील डोमेन श्रेणी (फक्त अंदाज)",src_reference:"संदर्भ",src_news:"बातमी",src_blog:"ब्लॉग/इतर",conflict:"स्रोतांमध्ये मतभेद",
+speak:"🔊 ऐका",fix:"✨ माझे उत्तर दुरुस्त करा",fixing:"पुन्हा लिहित आहे...",fixedTitle:"सावध पुनर्लेखनाची सूचना",fixedNote:"मॉडेल सल्ल्यांवर आधारित, पडताळलेली तथ्ये नाहीत; वापरण्यापूर्वी स्रोत तपासून संपादित करा.",
 copy:"📋 कॉपी",download:"⬇ .txt",share:"🔗 लिंक शेअर",pdf:"📄 PDF",copied:"कॉपी झाले!",linkCopied:"लिंक कॉपी झाली!",
-timeMachine:"🕰 टाइम मशीन",tmLoading:"इतिहास शोधत आहे...",tmNone:"स्रोतांमध्ये पुरेसा इतिहास सापडला नाही.",
-gwTitle:"गेटवे लाइव्ह पॅनल",gwSub:"या तपासणीची प्रत्येक पायरी, क्रमाने",gwGateway:"गेटवे",gwModel:"मॉडेल",gwCalls:"LLM कॉल",gwTokens:"टोकन",gwLive:"लाइव्ह सर्च",gwCache:"कॅश्ड सर्च",gwTime:"एकूण वेळ",gwCached:"कॅशमधून त्वरित निकाल",
-cmpTitle:"कोणता AI सर्वात जुने बोलतो?",cmpSub:"एकच प्रश्न अनेक मॉडेलना गेटवेमार्फत विचारा आणि ताजेपणाची तुलना करा.",cmpPlaceholder:"उदा. Python ची नवीन आवृत्ती कोणती आणि Anthropic चे CEO कोण?",cmpBtn:"मॉडेल तुलना करा",cmpLoading:"सर्व मॉडेलना विचारत आहे आणि तपासत आहे...",cmpBest:"सर्वात ताजे मॉडेल",cmpAnswer:"उत्तर",cmpErr:"अयशस्वी",
-dashTitle:"डॅशबोर्ड",dashSub:"कोणत्या प्रकारची तथ्ये सर्वात जास्त जुनी होतात?",kChecks:"तपासण्या",kClaims:"दावे",kStale:"जुने सापडले",kSearch:"लाइव्ह सर्च",dashEmpty:"अजून डेटा नाही. आधी एक तपासणी करा.",staleRate:"जुने",
+timeMachine:"शोध-परिणामांची कालरेषा",tmLoading:"शोध-परिणामांच्या उताऱ्यांवरून कालरेषेचा मसुदा तयार करत आहे...",tmNone:"या उताऱ्यांवरून कालरेषेचा मसुदा तयार झाला नाही; याचा अर्थ इतिहास नाही असा होत नाही.",tmDisclaimer:"हा फक्त शोध-उताऱ्यांवरून मॉडेलने तयार केलेला मसुदा आहे; तारखा व तपशील चुकीचे किंवा अपूर्ण असू शकतात. मूळ स्रोत तपासा.",
+gwTitle:"विनंती ट्रेस",gwSub:"या विनंतीतील दिसलेले टप्पे",gwGateway:"गेटवे",gwModel:"मॉडेल",gwCalls:"LLM कॉल",gwTokens:"टोकन",gwLive:"लाइव्ह सर्च",gwCache:"कॅश्ड सर्च",gwTime:"एकूण वेळ",gwCached:"परिणाम कॅशमधून मिळाला",
+cmpTitle:"मॉडेलच्या उत्तरांची तुलना",cmpSub:"उत्तरे तयार करून समान प्रयोगात्मक तपासण्या चालवा; गुण विश्वसनीयतेची क्रमवारी नाहीत आणि कोणताही विजेता निवडला जात नाही.",cmpPlaceholder:"उदा. Python ची नवीन आवृत्ती कोणती आणि Anthropic चे CEO कोण?",cmpBtn:"मॉडेल तुलना करा",cmpLoading:"मॉडेलची उत्तरे व अनुमानित लेबल तयार करत आहे...",cmpBest:"फक्त अनुमानित गुण; विजेता नाही",cmpAnswer:"उत्तर",cmpErr:"अयशस्वी",
+dashTitle:"डॅशबोर्ड",dashSub:"काढलेल्या दावा-प्रकारानुसार प्रयोगात्मक LLM लेबले.",kChecks:"तपासण्या",kClaims:"दावे",kStale:"संभाव्य विरोधाभास सूचना",kSearch:"लाइव्ह सर्च",dashEmpty:"अजून डेटा नाही. आधी एक तपासणी करा.",staleRate:"विरोधाभास सूचना",
 t_pricing:"किमती",t_version:"आवृत्त्या",t_leadership:"नेतृत्व",t_law:"कायदे",t_stat:"आकडेवारी",t_other:"इतर",
-howTitle:"कसे काम करते",howSub:"उत्तरापासून पुराव्यापर्यंत चार पायऱ्या.",
-s1t:"विचारा",s1p:"काहीही विचारा किंवा AI चे उत्तर पेस्ट करा.",s2t:"काढा",s2p:"बदलणारी तथ्ये आणि त्यांची नेमकी वाक्ये काढली जातात.",s3t:"तपासा",s3p:"प्रत्येक तथ्य लाइव्ह वेबवर शोधून पुराव्याची ओळ स्रोतात जुळवली जाते.",s4t:"दुरुस्त करा",s4p:"ताजेपणा स्कोअर, एक्सपायरी स्टॅम्प आणि दुरुस्त केलेले उत्तर.",
+howTitle:"How it works",howSub:"उत्तरापासून पुनरावलोकन सूचनांपर्यंत चार पायऱ्या.",
+s1t:"विचारा",s1p:"काहीही विचारा किंवा AI चे उत्तर पेस्ट करा.",s2t:"काढा",s2p:"LLM जास्तीत जास्त आठ संभाव्य बदलणारे दावे काढतो; काही सुटू शकतात.",s3t:"तपासा",s3p:"Tavily शोध-परिणाम शोधते; LLM स्निपेटचे मूल्यमापन करते. मूळ पाने उघडली किंवा प्रमाणित केली जात नाहीत.",s4t:"दुरुस्त करा",s4p:"सुचवलेली लेबले व अनुमानित गुण पाहा—हा निर्णय किंवा पडताळलेली दुरुस्ती नाही.",
 history:"अलीकडील तपासण्या",err:"काहीतरी चुकले. सर्व्हर चालू आहे का?",empty:"आधी काहीतरी लिहा.",shared:"शेअर केलेला अहवाल (फक्त पाहण्यासाठी)",
-say:(n,f,s)=>`${n} दावे तपासले. ${f} ताजे आणि ${s} जुने.`,warn:s=>`सावध राहा, ${s} माहिती जुनी आहे.`,allGood:"सर्व माहिती ताजी आहे."},
+say:(n,f,s)=>`${n} संभाव्य दाव्यांचे परीक्षण: ${f} LLM ने समर्थित, ${s} संभाव्य विरोधाभासी सुचवले. मूळ स्रोत तपासा.`,warn:s=>`${s} दाव्यांसाठी LLM ने संभाव्य विरोधाभास सुचवला आहे. मूळ स्रोत तपासा.`,allGood:"कोणताही दावा संभाव्य विरोधाभासी म्हणून लेबल केलेला नाही; यावरून माहिती अद्ययावत असल्याचे सिद्ध होत नाही."},
 hg:{name:"Hinglish",speech:"en-IN",loc:"en-IN",
 navHome:"Home",navTry:"Try karo",navCompare:"Model compare",navDash:"Dashboard",navHow:"Kaise kaam karta hai",
 mTheme:"Theme",dark:"Dark",light:"Light",mLang:"Language",mSound:"Sound & voice",on:"On",off:"Off",
-heroTitle:"Purane AI answers pakdo, gumraah hone se pehle",heroSub:"AI aksar purani info full confidence se bolta hai. FreshCheck har claim ko live web pe check karta hai, proof dikhata hai aur answer fix kar deta hai.",
-ctaTry:"Abhi try karo",ctaHow:"Kaise kaam karta hai",b1:"Live web verified",b2:"Har claim ka proof",b3:"4 languages",b4:"Voice support",
-tryTitle:"Answer check karo",trySub:"Sawal pucho ya koi bhi AI answer paste karo. Dekho kaunse facts purane ho gaye.",
-placeholder:"Sawal pucho, ya check karne ke liye AI ka answer paste karo...",askBtn:"Pucho + Check karo",checkBtn:"Paste kiya answer check karo",voiceBtn:"🎙 Voice chat",micBtn:"🎤 Bol ke likho",
+heroTitle:"AI answers ke time-sensitive claims review karo",heroSub:"FreshCheck Tavily result text aur LLM se review suggestions deta hai. Claims miss ya galat ho sakte hain; original sources khud check karein.",
+ctaTry:"Abhi try karo",ctaHow:"Kaise kaam karta hai",b1:"Tavily results + LLM review",b2:"Suggestions, proof nahi",b3:"4 languages",b4:"Voice support",
+tryTitle:"AI answer review karo",trySub:"Candidate claims ke model suggestions dekhein; claims miss ho sakte hain aur suggestions galat ho sakte hain.",
+placeholder:"Sawal pucho, ya review ke liye AI ka answer paste karo...",askBtn:"Pucho + Review karo",checkBtn:"Paste kiya answer review karo",voiceBtn:"🎙 Voice chat",micBtn:"🎤 Bol ke likho",
 demosLbl:"One-click demos:",d1:"Price trap",d2:"CEO trap",d3:"Version trap",d4:"Law trap (India)",d5:"Tech trap",
-loading:["Answer padh rahe hain...","Badalne wale claims nikal rahe hain...","Live web pe search ho raha hai...","Proof check ho raha hai..."],
-overall:"Overall freshness",claimsChecked:"claims check hue",fresh:"FRESH",stale:"STALE",unclear:"UNCLEAR",
-expired:"EXPIRED",bestBefore:"BEST BEFORE",verifyStamp:"VERIFY",
-answerHl:"Highlights ke saath answer",legend:"Laal = purana · Hara = sahi · Peela = unclear. Highlight pe click karke uske card pe jao.",
-evidence:"Source se proof",evOk:"✔ source ke andar verify hua",evNot:"Proof wali line source mein nahi mili, isliye unclear mark kiya.",
-correct:"Sahi / current value",why:"Kyun",source:"Source kholo",
-src_official:"Official",src_reference:"Reference",src_news:"News",src_blog:"Blog/other",conflict:"Sources mein matbhed",
-speak:"🔊 Suno",fix:"✨ Mera answer fix karo",fixing:"Dobara likh rahe hain...",fixedTitle:"Sudhra hua answer",fixedNote:"Highlight hisse verified sources se sudhare gaye hain.",
+loading:["Answer padh rahe hain...","Candidate claims nikal rahe hain...","Search-result snippets dhoondh rahe hain...","Snippets assess kar rahe hain (original page nahi)..."],
+overall:"Average heuristic score (not confidence)",claimsChecked:"candidate claims reviewed",fresh:"LLM suggests fresh",stale:"LLM suggests possible contradiction",unclear:"Needs review",
+expired:"Possible staleness",bestBefore:"Recheck estimate:",verifyStamp:"Needs review",
+answerHl:"Highlights ke saath answer",legend:"Colors LLM suggestions dikhate hain, sirf search-result text par; original sources khud check karein.",
+evidence:"Search-result excerpt",evOk:"Normalized quote sirf returned result text mein match hua; original page check nahi hua.",evNot:"Returned search text mein normalized quote match nahi hua; manually review karein.",
+correct:"Suggested replacement (source check karein)",why:"Kyun",source:"Search result kholo",
+src_official:"Listed domain category (heuristic only)",src_reference:"Reference",src_news:"News",src_blog:"Blog/other",conflict:"Sources mein matbhed",
+speak:"🔊 Suno",fix:"✨ Rewrite suggest karo",fixing:"Dobara likh rahe hain...",fixedTitle:"Cautious rewrite suggestion",fixedNote:"Model suggestions se bana, verified facts nahi; use karne se pehle sources check aur edit karein.",
 copy:"📋 Copy",download:"⬇ .txt",share:"🔗 Link share",pdf:"📄 PDF",copied:"Copy ho gaya!",linkCopied:"Link copy ho gaya!",
-timeMachine:"🕰 Time machine",tmLoading:"History khangal rahe hain...",tmNone:"Sources mein itni history nahi mili.",
-gwTitle:"Gateway live panel",gwSub:"Is check ka har step, order mein",gwGateway:"Gateway",gwModel:"Model",gwCalls:"LLM calls",gwTokens:"Tokens",gwLive:"Live searches",gwCache:"Cached searches",gwTime:"Total time",gwCached:"Cache se instant result",
-cmpTitle:"Kaunsa AI sabse purana bolta hai?",cmpSub:"Ek hi sawal kai models se gateway ke through pucho aur freshness compare karo.",cmpPlaceholder:"jaise: Python ka latest version kya hai aur Anthropic ka CEO kaun hai?",cmpBtn:"Models compare karo",cmpLoading:"Sab models se pooch rahe hain aur verify kar rahe hain...",cmpBest:"Sabse fresh model",cmpAnswer:"Answer",cmpErr:"Fail",
-dashTitle:"Dashboard",dashSub:"Kis type ke facts sabse zyada purane hote hain?",kChecks:"Checks",kClaims:"Claims",kStale:"Stale mile",kSearch:"Live searches",dashEmpty:"Abhi data nahi hai. Pehle ek check chalao.",staleRate:"stale",
+timeMachine:"Search-result timeline",tmLoading:"Search-result snippets se timeline draft kar rahe hain...",tmNone:"In snippets se timeline draft nahi hui; iska matlab yeh nahi ki history nahi hai.",tmDisclaimer:"Yeh sirf search snippets se bana model draft hai; dates/details galat ya incomplete ho sakte hain. Original sources check karo.",
+gwTitle:"Request trace",gwSub:"Is request ke observed steps",gwGateway:"Gateway",gwModel:"Model",gwCalls:"LLM calls",gwTokens:"Tokens",gwLive:"Live searches",gwCache:"Cached searches",gwTime:"Total time",gwCached:"Result cache se mila",
+cmpTitle:"Model answers compare karo",cmpSub:"Answers generate karke same experimental checks chalao; scores reliability ranking nahi hain aur koi winner declare nahi hota.",cmpPlaceholder:"jaise: Python ka latest version kya hai aur Anthropic ka CEO kaun hai?",cmpBtn:"Models compare karo",cmpLoading:"Models se answers aur heuristic labels le rahe hain...",cmpBest:"Heuristic score only; no winner",cmpAnswer:"Answer",cmpErr:"Fail",
+dashTitle:"Dashboard",dashSub:"Extracted claim category ke hisaab se experimental LLM labels.",kChecks:"Checks",kClaims:"Claims",kStale:"Possible contradiction suggestions",kSearch:"Live searches",dashEmpty:"Abhi data nahi hai. Pehle ek check chalao.",staleRate:"suggested contradiction",
 t_pricing:"Pricing",t_version:"Versions",t_leadership:"Leadership",t_law:"Laws",t_stat:"Stats",t_other:"Other",
-howTitle:"Kaise kaam karta hai",howSub:"Answer se proof tak 4 steps.",
-s1t:"Pucho",s1p:"Kuch bhi pucho ya AI answer paste karo.",s2t:"Nikalo",s2p:"Badalne wale facts aur unke exact sentences nikalte hain.",s3t:"Verify",s3p:"Har fact live web pe search hota hai aur proof line source mein match hoti hai.",s4t:"Fix",s4p:"Freshness score, expiry stamp aur sudhra hua answer.",
+howTitle:"How it works",howSub:"Answer se review suggestions tak 4 steps.",
+s1t:"Pucho",s1p:"Kuch bhi pucho ya AI answer paste karo.",s2t:"Nikalo",s2p:"LLM up to 8 candidate time-sensitive claims nikalta hai; claims miss ho sakte hain.",s3t:"Review",s3p:"Tavily search-result snippets dhoondhta hai; LLM unhe assess karta hai. Original pages open/authenticate nahi hote.",s4t:"Rewrite",s4p:"Model-suggested labels aur fixed heuristic score dekho, phir cautious rewrite banao; kuch bhi verified nahi hai.",
 history:"Recent checks",err:"Kuch gadbad ho gayi. Server chalu hai kya?",empty:"Pehle kuch likho.",shared:"Shared report (sirf dekhne ke liye)",
-say:(n,f,s)=>`${n} claims check hue. ${f} fresh aur ${s} stale.`,warn:s=>`Dhyan do, ${s} jaankari purani hai.`,allGood:"Saari jaankari fresh hai."}
+say:(n,f,s)=>`${n} candidate claims review hue: ${f} ko LLM ne supported, ${s} ko possibly contradicted suggest kiya. Original sources check karein.`,warn:s=>`${s} claims par LLM ne possible contradiction suggest kiya. Original sources check karein.`,allGood:"Kisi claim ko possible contradiction label nahi mila; isse current hona prove nahi hota."}
 };
 
 const L2={
-en:{navApi:"Gateway API",hOk:"Gateway online",hDown:"Gateway offline",hKey:"Tavily key missing",hVk:"Virtual key missing",
- hDownTip:"Cannot reach the gateway. Is the Bifrost terminal still running?",
+en:{navApi:"Gateway API",hOk:"Endpoint reachable",hDown:"Endpoint unreachable",hKey:"Tavily key missing",hVk:"Virtual key missing",
+ hDownTip:"Cannot reach the configured endpoint. A response does not confirm credentials or model access.",hOkTip:"This checks only that the configured endpoint responds; it does not confirm credentials or model access.",
  scoreWhy:"Why this score?",scoreTotal:"Total",
- sp_fresh_base:"Verified as current",sp_stale_base:"Found to be outdated",sp_unclear_base:"Could not be settled",
- sp_source_official:"Official source",sp_source_reference:"Reference source",sp_source_news:"News source",
- sp_proof_verified:"Proof line found in source",sp_sources_conflict:"Sources disagree",
- apiTitle:"Use it as a gateway layer",apiSub:"FreshCheck exposes an OpenAI-compatible endpoint in front of Bifrost. Any app can call it and get freshness info back with every answer.",
- apiReq:"1. Send a normal chat request",apiRes:"2. Get the answer + freshness info"},
-hi:{navApi:"गेटवे API",hOk:"गेटवे चालू",hDown:"गेटवे बंद",hKey:"Tavily key नहीं है",hVk:"Virtual key नहीं है",
- hDownTip:"गेटवे से कनेक्ट नहीं हो पा रहा। क्या Bifrost वाला टर्मिनल चालू है?",
+ sp_fresh_base:"LLM suggests fresh",sp_stale_base:"LLM suggests possible contradiction",sp_unclear_base:"Needs review",
+ sp_source_official:"Listed domain category (heuristic only)",sp_source_reference:"Reference source",sp_source_news:"News source",
+ sp_quote_matched:"Quote appears in returned search text only",sp_proof_verified:"Quote appears in returned search text only",sp_sources_conflict:"Sources disagree",
+ apiTitle:"Optional review sidecar",apiSub:"The OpenAI-compatible endpoint forwards to the configured provider and may add experimental review metadata to sufficiently long text replies. It is not a Bifrost core extension; streaming is unsupported.",
+ apiReq:"1. Send a normal chat request",apiRes:"2. Get the answer + optional review suggestions"},
+hi:{navApi:"गेटवे API",hOk:"Endpoint का जवाब मिला",hDown:"Endpoint से जवाब नहीं मिला",hKey:"Tavily key नहीं है",hVk:"Virtual key नहीं है",
+ hDownTip:"कॉन्फ़िगर किए गए endpoint तक नहीं पहुँच पा रहे। जवाब credentials या model access की पुष्टि नहीं है।",
+ hOkTip:"यह केवल endpoint के जवाब की जाँच करता है; credentials या model access की पुष्टि नहीं करता।",
  scoreWhy:"यह स्कोर क्यों?",scoreTotal:"कुल",
- sp_fresh_base:"मौजूदा पाया गया",sp_stale_base:"पुराना पाया गया",sp_unclear_base:"तय नहीं हो सका",
- sp_source_official:"आधिकारिक स्रोत",sp_source_reference:"संदर्भ स्रोत",sp_source_news:"समाचार स्रोत",
- sp_proof_verified:"सबूत की लाइन स्रोत में मिली",sp_sources_conflict:"स्रोतों में मतभेद",
- apiTitle:"गेटवे लेयर की तरह इस्तेमाल करें",apiSub:"FreshCheck, Bifrost के आगे एक OpenAI-compatible endpoint देता है। कोई भी ऐप इसे बुलाकर हर जवाब के साथ ताज़गी की जानकारी पा सकता है।",
- apiReq:"1. सामान्य चैट रिक्वेस्ट भेजें",apiRes:"2. जवाब + ताज़गी की जानकारी पाएँ"},
-mr:{navApi:"गेटवे API",hOk:"गेटवे चालू",hDown:"गेटवे बंद",hKey:"Tavily key नाही",hVk:"Virtual key नाही",
- hDownTip:"गेटवेशी कनेक्ट होत नाही. Bifrost चा टर्मिनल चालू आहे का?",
+ sp_fresh_base:"LLM ने ताज़ा होने का सुझाव दिया",sp_stale_base:"LLM ने संभावित विरोधाभास सुझाया",sp_unclear_base:"समीक्षा चाहिए",
+ sp_source_official:"सूचीबद्ध डोमेन श्रेणी (केवल अनुमान)",sp_source_reference:"संदर्भ स्रोत",sp_source_news:"समाचार स्रोत",
+ sp_quote_matched:"उद्धरण केवल खोज-परिणाम के पाठ में मिला",sp_proof_verified:"उद्धरण केवल खोज-परिणाम के पाठ में मिला",sp_sources_conflict:"स्रोतों में मतभेद",
+ apiTitle:"वैकल्पिक समीक्षा साइडकार",apiSub:"OpenAI-compatible endpoint कॉन्फ़िगर किए गए provider को request भेजता है और लंबे text replies में प्रयोगात्मक समीक्षा सुझाव जोड़ सकता है। यह Bifrost का core extension नहीं है; streaming समर्थित नहीं है।",
+ apiReq:"1. सामान्य चैट रिक्वेस्ट भेजें",apiRes:"2. जवाब + वैकल्पिक समीक्षा सुझाव पाएँ"},
+mr:{navApi:"गेटवे API",hOk:"Endpoint कडून प्रतिसाद मिळाला",hDown:"Endpoint कडून प्रतिसाद मिळाला नाही",hKey:"Tavily key नाही",hVk:"Virtual key नाही",
+ hDownTip:"कॉन्फिगर केलेल्या endpoint शी संपर्क होत नाही.",
+ hOkTip:"ही फक्त endpoint प्रतिसाद देतो का ते तपासते; credentials किंवा model access ची पुष्टी करत नाही.",
  scoreWhy:"हा स्कोअर का?",scoreTotal:"एकूण",
- sp_fresh_base:"सध्याचे आढळले",sp_stale_base:"जुने आढळले",sp_unclear_base:"ठरवता आले नाही",
- sp_source_official:"अधिकृत स्रोत",sp_source_reference:"संदर्भ स्रोत",sp_source_news:"बातमी स्रोत",
- sp_proof_verified:"पुराव्याची ओळ स्रोतात सापडली",sp_sources_conflict:"स्रोतांमध्ये मतभेद",
- apiTitle:"गेटवे लेयर म्हणून वापरा",apiSub:"FreshCheck, Bifrost च्या पुढे OpenAI-compatible endpoint देतो. कोणतेही अॅप तो वापरून प्रत्येक उत्तरासोबत ताजेपणाची माहिती मिळवू शकते.",
- apiReq:"1. सामान्य चॅट रिक्वेस्ट पाठवा",apiRes:"2. उत्तर + ताजेपणाची माहिती मिळवा"},
-hg:{navApi:"Gateway API",hOk:"Gateway online",hDown:"Gateway offline",hKey:"Tavily key missing",hVk:"Virtual key missing",
- hDownTip:"Gateway se connect nahi ho raha. Bifrost wala terminal chalu hai kya?",
+ sp_fresh_base:"LLM ने ताजे असल्याचा अंदाज सुचवला",sp_stale_base:"LLM ने संभाव्य विरोधाभास सुचवला",sp_unclear_base:"पुनरावलोकन आवश्यक",
+ sp_source_official:"यादीतील डोमेन श्रेणी (फक्त अंदाज)",sp_source_reference:"संदर्भ स्रोत",sp_source_news:"बातमी स्रोत",
+ sp_quote_matched:"उद्धरण फक्त शोध-परिणामाच्या मजकुरात जुळले",sp_proof_verified:"उद्धरण फक्त शोध-परिणामाच्या मजकुरात जुळले",sp_sources_conflict:"स्रोतांमध्ये मतभेद",
+ apiTitle:"पर्यायी पुनरावलोकन साइडकार",apiSub:"OpenAI-compatible endpoint कॉन्फिगर केलेल्या provider कडे request पाठवतो आणि पुरेशा लांब text replies मध्ये प्रयोगात्मक सूचना जोडू शकतो. हे Bifrost core extension नाही; streaming समर्थित नाही.",
+ apiReq:"1. सामान्य चॅट रिक्वेस्ट पाठवा",apiRes:"2. उत्तर + पर्यायी पुनरावलोकन सूचना मिळवा"},
+hg:{navApi:"Gateway API",hOk:"Endpoint reachable",hDown:"Endpoint unreachable",hKey:"Tavily key missing",hVk:"Virtual key missing",
+ hDownTip:"Configured endpoint tak nahi pahunch pa rahe. Response milna credentials ya model access ki tasdeeq nahi hai.",
+ hOkTip:"Yeh sirf endpoint ka response check karta hai; credentials ya model access confirm nahi hote.",
  scoreWhy:"Ye score kyun?",scoreTotal:"Total",
- sp_fresh_base:"Current paya gaya",sp_stale_base:"Purana paya gaya",sp_unclear_base:"Tay nahi ho saka",
- sp_source_official:"Official source",sp_source_reference:"Reference source",sp_source_news:"News source",
- sp_proof_verified:"Proof line source mein mili",sp_sources_conflict:"Sources mein matbhed",
- apiTitle:"Gateway layer ki tarah use karo",apiSub:"FreshCheck, Bifrost ke aage ek OpenAI-compatible endpoint deta hai. Koi bhi app ise bulakar har answer ke saath freshness info pa sakta hai.",
- apiReq:"1. Normal chat request bhejo",apiRes:"2. Answer + freshness info pao"}
+ sp_fresh_base:"LLM ne fresh hone ka suggestion diya",sp_stale_base:"LLM ne possible contradiction suggest kiya",sp_unclear_base:"Review needed",
+ sp_source_official:"Listed domain category (heuristic only)",sp_source_reference:"Reference source",sp_source_news:"News source",
+ sp_quote_matched:"Quote sirf returned search text mein mila",sp_proof_verified:"Quote sirf returned search text mein mila",sp_sources_conflict:"Sources mein matbhed",
+ apiTitle:"Optional review sidecar",apiSub:"OpenAI-compatible endpoint configured provider ko request bhejta hai aur sufficiently long text replies mein experimental review suggestions add kar sakta hai. Ye Bifrost core extension nahi; streaming supported nahi hai.",
+ apiReq:"1. Normal chat request bhejo",apiRes:"2. Answer + optional review suggestions pao"}
 };
 Object.keys(L2).forEach(k=>Object.assign(L[k],L2[k]));
 const DEMOS=[
@@ -468,10 +471,18 @@ const DEMOS=[
 
 /* ---------- state ---------- */
 const S={lang:"en",theme:"dark",sound:true,data:null,fixed:null,tm:{},cmp:null,stats:null,shared:false};
-try{Object.assign(S,JSON.parse(localStorage.getItem("fc_prefs")||"{}"))}catch(e){}
+try{
+  const prefs=JSON.parse(localStorage.getItem("fc_prefs")||"{}");
+  if(prefs&&typeof prefs==="object"&&!Array.isArray(prefs)){
+    if(Object.prototype.hasOwnProperty.call(L,prefs.lang))S.lang=prefs.lang;
+    if(prefs.theme==="dark"||prefs.theme==="light")S.theme=prefs.theme;
+    if(typeof prefs.sound==="boolean")S.sound=prefs.sound;
+  }
+}catch(e){}
 const $=id=>document.getElementById(id);
 const T=()=>L[S.lang];
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeHttpUrl=value=>{try{const u=new URL(String(value||""));return /^https?:$/.test(u.protocol)&&!u.username&&!u.password?u.href:""}catch{return ""}};
 const save=()=>{try{localStorage.setItem("fc_prefs",JSON.stringify({lang:S.lang,theme:S.theme,sound:S.sound}))}catch(e){}};
 
 /* ---------- sound + voice ---------- */
@@ -522,6 +533,7 @@ function applySound(){$("soundBtn").textContent=S.sound?"🔊":"🔇";$("sndOn")
 /* ---------- rendering helpers ---------- */
 const colorFor=v=>v==="fresh"?"var(--good)":v==="stale"?"var(--bad)":"var(--warn)";
 function ring(score,size,stroke,col){
+  score=Number.isFinite(Number(score))?Math.max(0,Math.min(100,Number(score))):0;
   const r=(size-stroke)/2,c=2*Math.PI*r;
   return `<svg width="${size}" height="${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--border)" stroke-width="${stroke}"/><circle class="arc" data-c="${c}" data-s="${score}" cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${col}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c}" style="transition:stroke-dashoffset 1.3s ease"/></svg>`;
 }
@@ -567,8 +579,8 @@ function renderResults(){
   const d=S.data,t=T(),cl=d.claims||[],s=d.summary||{avg:0,fresh:0,stale:0,unclear:0,n:cl.length};
   if(!cl.length){
     $("results").innerHTML=`<div class="panel"><div class="ansbox"><h4>${esc(t.answerHl)}</h4>${esc(d.answer||"")}</div>
-     <div class="ansbox" style="margin-top:14px"><h4>✅ No time-sensitive facts found</h4>
-     <div class="muted">This text has nothing that goes out of date (no prices, versions, office-holders or laws), so there is nothing to score. Try a claim like “The latest iPhone is the iPhone 14.”</div></div></div>`+gwPanel(d.trace);
+     <div class="ansbox" style="margin-top:14px"><h4>No candidate claims returned</h4>
+     <div class="muted">The extractor may have missed time-sensitive claims. This is not evidence that everything is current. Try a claim like “The latest iPhone is the iPhone 14.”</div></div></div>`+gwPanel(d.trace);
     return;
   }
   const gcol=s.avg>=70?"var(--good)":s.avg>=40?"var(--warn)":"var(--bad)";
@@ -602,8 +614,8 @@ function renderResults(){
       ${spBlock(c)}
       ${c.evidence_quote?`<div class="lbl">${esc(t.evidence)}</div><div class="ev">“${esc(c.evidence_quote)}”</div><div class="ev-ok">${esc(t.evOk)}</div>`:`<div class="ev-no">${esc(t.evNot)}</div>`}
       ${c.conflict?`<div class="warnc">⚠ ${esc(t.conflict)}${c.conflict_note?": "+esc(c.conflict_note):""}</div>`:""}
-      <div style="margin-top:12px">${c.source_url?`<span class="sb sb-${esc(c.source_type||"blog")}">${esc(t["src_"+(c.source_type||"blog")]||"")}</span><a href="${esc(c.source_url)}" target="_blank" rel="noopener">🔗 ${esc(t.source)}</a>`:""}</div>
-      <div><span class="stamp" data-stamp="${c.verdict}" style="--c:${col};--d:${delay}s">${esc(stampText(c))}</span></div>
+      <div style="margin-top:12px">${safeHttpUrl(c.source_url)?`<span class="sb sb-${esc(c.source_type||"blog")}">${esc(t["src_"+(c.source_type||"blog")]||"")}</span><a href="${esc(safeHttpUrl(c.source_url))}" target="_blank" rel="noopener noreferrer">🔗 ${esc(t.source)}</a>`:""}</div>
+      <div><span class="stamp" data-stamp="${esc(c.verdict)}" style="--c:${col};--d:${delay}s">${esc(stampText(c))}</span></div>
       ${S.shared||!c.search_query?"":`<div class="tmb noprint"><button class="btn sm ghost" data-tm="${i}">${esc(t.timeMachine)}</button></div><div class="tmbox noprint" id="tm${i}"></div>`}
     </div>`;
   });
@@ -665,14 +677,14 @@ async function openTM(i){
 }
 function renderTM(i){
   const box=$("tm"+i),h=S.tm[i];if(!box||!h)return;
-  if(!h.timeline||!h.timeline.length){box.innerHTML=`<div class="muted">${esc(T().tmNone)}</div>`;return}
+  if(!h.timeline||!h.timeline.length){box.innerHTML=`<div class="legend">${esc(T().tmDisclaimer)}</div><div class="muted">${esc(T().tmNone)}</div>`;return}
   const n=h.timeline.length;
   box.classList.add("open");
-  box.innerHTML=`<div class="tmtrack">${h.timeline.map((e,k)=>`<span class="dot" data-k="${k}"><i></i>${esc(e.when)}</span>`).join("")}</div>
+  box.innerHTML=`<div class="legend">${esc(T().tmDisclaimer)}</div><div class="tmtrack">${h.timeline.map((e,k)=>`<span class="dot" data-k="${k}"><i></i>${esc(e.when)}</span>`).join("")}</div>
    <input type="range" class="tmr" id="tmr${i}" min="0" max="${n-1}" value="${n-1}"><div class="tmview" id="tmv${i}"></div>`;
   const show=k=>{
     const e=h.timeline[k];
-    $("tmv"+i).innerHTML=`<b>${esc(e.when)}</b>: ${esc(e.value)}${e.note?`<br><span class="muted">${esc(e.note)}</span>`:""}${e.source_url?` <a href="${esc(e.source_url)}" target="_blank" rel="noopener">🔗</a>`:""}`;
+    $("tmv"+i).innerHTML=`<b>${esc(e.when)}</b>: ${esc(e.value)}${e.note?`<br><span class="muted">${esc(e.note)}</span>`:""}${safeHttpUrl(e.source_url)?` <a href="${esc(safeHttpUrl(e.source_url))}" target="_blank" rel="noopener noreferrer">🔗</a>`:""}`;
     box.querySelectorAll(".dot").forEach((d,j)=>d.classList.toggle("on",j<=k));
   };
   const r=$("tmr"+i);r.oninput=()=>{show(+r.value);sfx.hover()};
@@ -690,9 +702,31 @@ function shareLink(d){
 function loadShared(){
   if(!location.hash.startsWith("#report="))return;
   try{
-    let b=location.hash.slice(8).replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";
+    const encoded=location.hash.slice(8);
+    if(encoded.length>30000)return;
+    let b=encoded.replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";
     const o=JSON.parse(decodeURIComponent(escape(atob(b))));
-    S.data={answer:o.a,summary:o.s,cached:false,trace:null,claims:o.c.map(c=>({claim:c.c,verdict:c.v,freshness_score:c.f,correct_value:c.x,source_url:c.u,evidence_quote:c.e,type:c.t,source_type:c.b,reason:c.r,best_before:c.bb,span:c.sp,conflict:!!c.cf,conflict_note:"",search_query:""}))};
+    if(!o||typeof o!=="object"||!Array.isArray(o.c))return;
+    const text=(v,max=4000)=>typeof v==="string"?v.slice(0,max):"";
+    const number=(v,max=100)=>{const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(max,n)):0};
+    const allowedVerdicts=["fresh","stale","unclear"],allowedTypes=["pricing","version","leadership","law","stat","other"];
+    const allowedSources=["official","reference","news","blog"],answer=text(o.a,1500);
+    const claims=o.c.slice(0,8).filter(c=>c&&typeof c==="object"&&!Array.isArray(c)).map(c=>{
+      const verdict=allowedVerdicts.includes(c.v)?c.v:"unclear";
+      let span=null;
+      if(Array.isArray(c.sp)&&c.sp.length===2){
+        const start=Number(c.sp[0]),end=Number(c.sp[1]);
+        if(Number.isInteger(start)&&Number.isInteger(end)&&start>=0&&end>start&&end<=answer.length)span=[start,end];
+      }
+      return {claim:text(c.c,1000),verdict,freshness_score:number(c.f),correct_value:text(c.x,1000),
+        source_url:text(c.u,2048),evidence_quote:text(c.e,1000),type:allowedTypes.includes(c.t)?c.t:"other",
+        source_type:allowedSources.includes(c.b)?c.b:"blog",reason:text(c.r,2000),
+        best_before:/^\d{4}-\d{2}-\d{2}$/.test(c.bb)?c.bb:null,span,conflict:c.cf===1||c.cf===true,
+        conflict_note:"",search_query:""};
+    }).filter(c=>c.claim.trim());
+    const n=claims.length,fresh=claims.filter(c=>c.verdict==="fresh").length,stale=claims.filter(c=>c.verdict==="stale").length;
+    const avg=n?Math.round(claims.reduce((sum,c)=>sum+c.freshness_score,0)/n):0;
+    S.data={answer,summary:{avg,fresh,stale,unclear:n-fresh-stale,n},cached:false,trace:null,claims};
     S.shared=true;renderResults();setTimeout(()=>$("try").scrollIntoView(),100);
   }catch(e){}
 }
@@ -716,7 +750,7 @@ async function go(path,opt){
     if(!r.ok){let m="";try{m=(await r.json()).detail}catch(e){}throw new Error(m||r.status)}
     S.data=await r.json();renderResults();
     const s=S.data.summary;addHist(text,(S.data.claims||[]).length?s.avg:null);refreshStats();
-    if(s.stale===0&&s.n>0){sfx.good();confetti()}else{sfx.bad()}
+    if(s.stale>0)sfx.bad();
     document.querySelectorAll('[data-stamp="stale"]').forEach((el,k)=>setTimeout(sfx.stamp,500+k*250));
     if(opt.voice)setTimeout(()=>speak(shortAns(S.data.answer)+" "+(s.stale?T().warn(s.stale):T().allGood)),900);
     else setTimeout(()=>speak(T().say(s.n,s.fresh,s.stale)),900);
@@ -737,12 +771,12 @@ $("bMic").onclick=()=>listen($("bMic"),txt=>{$("inp").value=txt});
 $("bVoice").onclick=()=>listen($("bVoice"),txt=>{$("inp").value=txt;go("/ask",{voice:true})});
 
 /* ---------- history ---------- */
-const getHist=()=>{try{return JSON.parse(localStorage.getItem("fc_hist")||"[]")}catch(e){return[]}};
+const getHist=()=>{try{const raw=JSON.parse(localStorage.getItem("fc_hist")||"[]");if(!Array.isArray(raw))return[];return raw.filter(x=>x&&typeof x==="object"&&!Array.isArray(x)&&typeof x.text==="string").slice(0,5).map(x=>({text:x.text.slice(0,10000),avg:x.avg==null?null:(Number.isFinite(Number(x.avg))?Math.max(0,Math.min(100,Number(x.avg))):null)}))}catch(e){return[]}};
 function addHist(text,avg){const h=getHist().filter(x=>x.text!==text);h.unshift({text,avg});try{localStorage.setItem("fc_hist",JSON.stringify(h.slice(0,5)))}catch(e){}renderHist()}
 function renderHist(){
   const h=getHist();if(!h.length){$("hist").innerHTML="";return}
   $("hist").innerHTML=`<h3>🕘 ${esc(T().history)}</h3>`+h.map((x,i)=>`<div class="h" data-i="${i}"><span>${esc(x.text.slice(0,80))}</span><b>${x.avg===null||x.avg===undefined?"—":esc(x.avg)+"/100"}</b></div>`).join("");
-  document.querySelectorAll(".h").forEach(e=>e.onclick=()=>{$("inp").value=getHist()[e.dataset.i].text;$("inp").scrollIntoView({behavior:"smooth",block:"center"})});
+  document.querySelectorAll(".h").forEach(e=>e.onclick=()=>{const item=getHist()[Number(e.dataset.i)];if(!item)return;$("inp").value=item.text;$("inp").scrollIntoView({behavior:"smooth",block:"center"})});
 }
 
 /* ---------- compare models ---------- */
@@ -751,22 +785,22 @@ async function runCmp(){
   setBusy(true);$("cmpOut").innerHTML="";$("cmpLoad").style.display="block";sfx.start();
   try{
     const r=await fetch("/compare",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});
-    if(!r.ok)throw new Error(r.status);S.cmp=await r.json();renderCmp();refreshStats();sfx.good();
+    if(!r.ok)throw new Error(r.status);S.cmp=await r.json();renderCmp();refreshStats();
   }catch(e){$("cmpOut").innerHTML=`<div class="panel" style="margin-top:16px">⚠ ${esc(t.err)}</div>`;sfx.bad()}
   $("cmpLoad").style.display="none";setBusy(false);
 }
 function renderCmp(){
-  const t=T(),ms=(S.cmp.models||[]).slice().sort((a,b)=>(a.error?1:0)-(b.error?1:0)||b.summary.avg-a.summary.avg);
-  const ok=ms.filter(m=>!m.error);
-  let h=ok.length?`<div class="crown">🏆 ${esc(t.cmpBest)}: ${esc(ok[0].model)} (${ok[0].summary.avg}/100)</div>`:"";
-  h+=`<div class="cmpgrid">`;
+  const ms=(Array.isArray(S.cmp&&S.cmp.models)?S.cmp.models:[]).filter(m=>m&&typeof m==="object").slice().sort((a,b)=>String(a.model||"").localeCompare(String(b.model||"")));
+  const count=v=>{const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(1e9,n)):0};
+  let h=`<div class="cmpgrid">`;
   ms.forEach((m,i)=>{
-    const col=m.summary.avg>=70?"var(--good)":m.summary.avg>=40?"var(--warn)":"var(--bad)";
-    const stale=(m.claims||[]).filter(c=>c.verdict==="stale").slice(0,3);
-    h+=`<div class="mc ${i===0&&!m.error?"best":""}" style="animation-delay:${i*.12}s">
-     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><h4>${["🥇","🥈","🥉"][i]||"#"+(i+1)} ${esc(m.model)}</h4>
-     <div class="muted" style="font-size:12px;margin-top:4px">✔ ${m.summary.fresh} · ✖ ${m.summary.stale} · ? ${m.summary.unclear}</div></div>
-     <div class="mini" style="width:64px;height:64px">${ring(m.summary.avg,64,7,col)}<span>${m.summary.avg}</span></div></div>
+    const col="var(--a)",summary=m.summary&&typeof m.summary==="object"?m.summary:{};
+    const fresh=count(summary.fresh),staleCount=count(summary.stale),unclear=count(summary.unclear),avg=count(summary.avg);
+    const stale=(Array.isArray(m.claims)?m.claims:[]).filter(c=>c&&typeof c==="object"&&c.verdict==="stale").slice(0,3);
+    h+=`<div class="mc" style="animation-delay:${i*.12}s">
+     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><h4>${esc(m.model)}</h4>
+     <div class="muted" style="font-size:12px;margin-top:4px">✔ ${fresh} · ✖ ${staleCount} · ? ${unclear}</div></div>
+     <div class="mini" style="width:64px;height:64px">${ring(avg,64,7,col)}<span>${avg}</span></div></div>
      ${m.error?`<div class="sl">⚠ ${esc(t.cmpErr)}: ${esc(m.error)}</div>`:`<div class="ans"><b>${esc(t.cmpAnswer)}:</b> ${esc(m.answer)}</div>`}
      ${stale.map(c=>`<div class="sl">✖ ${esc(c.claim)}${c.correct_value?" → "+esc(c.correct_value):""}</div>`).join("")}</div>`;
   });
@@ -777,11 +811,13 @@ function renderCmp(){
 async function refreshStats(){try{const r=await fetch("/stats");if(r.ok){S.stats=await r.json();renderDash()}}catch(e){}}
 function renderDash(){
   const s=S.stats,t=T(),box=$("dash");
-  if(!s||!s.claims){box.innerHTML=`<div class="panel muted" style="text-align:center">${esc(t.dashEmpty)}</div>`;return}
-  const types=["pricing","version","leadership","law","stat","other"].filter(k=>s.types&&s.types[k]);
-  const totStale=types.reduce((a,k)=>a+s.types[k].stale,0);
-  let h=`<div class="kpis"><div class="kpi"><b>${s.checks}</b>${esc(t.kChecks)}</div><div class="kpi"><b>${s.claims}</b>${esc(t.kClaims)}</div><div class="kpi"><b>${totStale}</b>${esc(t.kStale)}</div><div class="kpi"><b>${s.live_searches}</b>${esc(t.kSearch)}</div></div><div class="panel">`;
-  types.map(k=>({k,v:s.types[k],tot:s.types[k].fresh+s.types[k].stale+s.types[k].unclear})).sort((a,b)=>b.v.stale/b.tot-a.v.stale/a.tot).forEach(x=>{
+  if(!s||typeof s!=="object"){box.innerHTML=`<div class="panel muted" style="text-align:center">${esc(t.dashEmpty)}</div>`;return}
+  const count=v=>{const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(1e9,n)):0};
+  const rawTypes=s.types&&typeof s.types==="object"?s.types:{};
+  const types=["pricing","version","leadership","law","stat","other"].map(k=>{const v=rawTypes[k]&&typeof rawTypes[k]==="object"?rawTypes[k]:{};return {k,v:{fresh:count(v.fresh),stale:count(v.stale),unclear:count(v.unclear)}}}).map(x=>({...x,tot:x.v.fresh+x.v.stale+x.v.unclear})).filter(x=>x.tot>0);
+  const totStale=types.reduce((a,x)=>a+x.v.stale,0);
+  let h=`<div class="kpis"><div class="kpi"><b>${count(s.checks)}</b>${esc(t.kChecks)}</div><div class="kpi"><b>${count(s.claims)}</b>${esc(t.kClaims)}</div><div class="kpi"><b>${totStale}</b>${esc(t.kStale)}</div><div class="kpi"><b>${count(s.live_searches)}</b>${esc(t.kSearch)}</div></div><div class="panel">`;
+  types.sort((a,b)=>b.v.stale/b.tot-a.v.stale/a.tot).forEach(x=>{
     const p=n=>(n/x.tot*100).toFixed(1);
     h+=`<div class="brow"><span>${esc(t["t_"+x.k])}</span><div class="stack"><i style="width:${p(x.v.fresh)}%;background:var(--good)"></i><i style="width:${p(x.v.unclear)}%;background:var(--warn)"></i><i style="width:${p(x.v.stale)}%;background:var(--bad)"></i></div><b>${Math.round(x.v.stale/x.tot*100)}% ${esc(t.staleRate)}</b></div>`;
   });
@@ -807,7 +843,7 @@ async function refreshHealth(){
   if(!HEALTH){el.className="health down";$("healthTxt").textContent=t.hDown;el.title=t.hDownTip;return}
   if(!HEALTH.gateway_ok){el.className="health down";$("healthTxt").textContent=HEALTH.gateway+" · "+t.hDown;el.title=t.hDownTip}
   else if(!HEALTH.tavily_key){el.className="health warn";$("healthTxt").textContent=t.hKey;el.title=t.hKey}
-  else{el.className="health ok";$("healthTxt").textContent=HEALTH.gateway+" · "+t.hOk;el.title=HEALTH.gateway_url+" · "+HEALTH.model}
+  else{el.className="health ok";$("healthTxt").textContent=HEALTH.gateway+" · "+t.hOk;el.title=HEALTH.gateway_url+" · "+HEALTH.model+" · "+t.hOkTip}
   renderApi();
 }
 function renderApi(){
@@ -825,24 +861,27 @@ r = requests.post(
 )
 print(r.headers["x-freshcheck-status"], r.headers["x-freshcheck-score"])
 print(r.json()["freshcheck"]["claims"])`;
-  $("apiResTxt").textContent=`HTTP 200
-x-freshcheck-status: stale-found
-x-freshcheck-score:  42
-x-freshcheck-stale:  1
+  $("apiResTxt").textContent=`HTTP 200 (illustrative response shape; values are placeholders)
+x-freshcheck-status: possible-stale-suggestion | needs-review | no-stale-suggestion
+x-freshcheck-score:  <heuristic score, not probability>
 
 {
   "choices": [ { "message": { "content": "..." } } ],
   "freshcheck": {
-    "score": 42, "fresh": 1, "stale": 1, "unclear": 0,
+    "score": <average heuristic score>,
+    "fresh": <suggested count>, "stale": <suggested count>, "unclear": <count>,
     "claims": [ {
-      "claim": "Python 3.12 is the latest version",
-      "verdict": "stale", "score": 3,
-      "correct_value": "Python 3.15.0",
-      "source_url": "https://www.python.org/downloads/",
-      "evidence": "Python 3.15.0 Oct. 9, 2026 ..."
+      "claim": "<candidate claim>",
+      "verdict": "<fresh | stale | unclear>", "score": <heuristic score>,
+      "correct_value": "<model suggestion; check the source>",
+      "evidence_quote_matched": <true if the quote occurs in returned search text>,
+      "source_url": "<returned source link>",
+      "evidence": "<matched search-result text, not page verification>"
     } ]
   }
-}`;
+}
+
+If review fails, the original chat response may still return with x-freshcheck-status: error and no FreshCheck metadata.`;
 }
 document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{
   const txt=$(b.dataset.copy+"Txt").textContent;

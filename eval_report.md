@@ -1,22 +1,22 @@
-# FreshCheck evaluation
+## FreshCheck selected-case smoke run
 
-Date: 2026-11-05  |  Gateway: Bifrost  |  Model: groq/openai/gpt-oss-120b
+Date: 2026-11-05  |  Provider: Bifrost  |  Model: groq/openai/gpt-oss-120b
 
-**12/12 cases correct (100%)**
+This is the recorded output of one run, not a rerun against the current code revision. The small, hand-selected cases are a smoke check, not an accuracy estimate or benchmark.
 
-| Case | Expected | Got | Result |
+| Case | Expected | Recorded output | Recorded script result |
 |---|---|---|---|
-| Python version | stale | stale | PASS |
-| Twitter CEO | stale | stale | PASS |
-| India: IPC | stale | stale | PASS |
-| India: CrPC | stale | stale | PASS |
-| India: GST slabs | stale | stale | PASS |
-| iPhone | stale | stale | PASS |
-| ChatGPT model | stale | stale | PASS |
-| Node.js LTS | stale | stale | PASS |
-| Windows | stale | stale | PASS |
-| Anthropic CEO | fresh | fresh | PASS |
-| Microsoft CEO | fresh | fresh | PASS |
-| Timeless fact | none | (no claims) | PASS |
+| Python version | stale | stale | MATCH |
+| Twitter CEO | stale | stale | MATCH |
+| India: IPC | stale | stale | MATCH |
+| India: CrPC | stale | stale | MATCH |
+| India: GST slabs | stale | stale | MATCH |
+| iPhone | stale | stale | MATCH |
+| ChatGPT model | stale | stale | MATCH |
+| Node.js LTS | stale | stale | MATCH |
+| Windows | stale | stale | MATCH |
+| Anthropic CEO | fresh | fresh | MATCH |
+| Microsoft CEO | fresh | fresh | MATCH |
+| Timeless fact | none | (no claims) | MATCH |
 
-Cases are single-sentence claims with known answers. `stale` = must be flagged outdated, `fresh` = must be confirmed current, `none` = must not be flagged.
+The 12 hand-selected cases and their expected labels are a narrow smoke check, not a representative sample. `stale`, `fresh`, and `none` are the script’s expected-label rules; a match does not prove a claim true, current, or correctly interpreted.

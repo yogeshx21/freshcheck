@@ -1,4 +1,4 @@
-# Tests the full path:  you -> Bifrost -> Groq model -> (tool call) -> FreshCheck MCP -> live web
+# Live integration smoke test: Bifrost -> model -> FreshCheck MCP; Tavily may return cached search snippets.
 # Run:  py test_bifrost_mcp.py
 # Needs: Bifrost (port 8080) and FreshCheck (port 8000) running, and BIFROST_VK in .env
 import json
@@ -24,7 +24,7 @@ body = {
     "messages": [{
         "role": "user",
         "content": ("Is Python 3.12 the latest Python version? "
-                    "Use the freshness tool to verify before you answer."),
+                    "Use FreshCheck's review suggestions, and inspect their limits before answering."),
     }],
 }
 

@@ -16,4 +16,4 @@ timeout /t 5 /nobreak >nul
 start "" http://127.0.0.1:8000
 echo.
 echo Website: http://127.0.0.1:8000    Bifrost dashboard: http://localhost:8080
-echo Website ke upar right mein hara "Bifrost - Gateway online" dikhna chahiye.
+echo Endpoint badge sirf response dikhata hai; credentials ya model access verify nahi karta.

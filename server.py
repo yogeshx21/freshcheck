@@ -12,7 +12,7 @@ from verifier import (
     check_answer, fix_answer, fact_history, compare_models, summarize, load_stats, ANSWER_SYSTEM,
 )
 
-from mcp_server import handle_rpc
+from mcp_server import handle_batch, handle_rpc
 
 app = FastAPI(title="FreshCheck")
 
@@ -183,9 +183,9 @@ def stats():
 
 # ---------------------------------------------------------------------------
 # FreshCheck SIDECAR (works on Windows, no Go needed).
-# An OpenAI-compatible endpoint: apps call THIS instead of Bifrost directly.
-# It forwards to Bifrost (LLM_BASE_URL), then adds freshness info to the reply.
-# This is the fallback if the real Go plugin cannot be built.
+# OpenAI-compatible sidecar: apps call this endpoint instead of the configured LLM provider.
+# It may append experimental LLM review suggestions to sufficiently long text responses.
+# It is not a Bifrost core extension.
 # ---------------------------------------------------------------------------
 def fc_payload(d):
     s = d["summary"]
@@ -193,7 +193,10 @@ def fc_payload(d):
         "score": s["avg"], "fresh": s["fresh"], "stale": s["stale"], "unclear": s["unclear"],
         "claims": [
             {"claim": c["claim"], "verdict": c["verdict"], "score": c["freshness_score"],
-             "correct_value": c.get("correct_value", ""), "source_url": c.get("source_url", ""),
+             "correct_value": c.get("correct_value", ""),
+             "evidence_quote": c.get("evidence_quote", ""),
+             "evidence_quote_matched": c.get("evidence_quote_matched", False),
+             "source_url": c.get("source_url", ""),
              "evidence": c.get("evidence_quote", "")}
             for c in d["claims"]
         ],
@@ -221,7 +224,11 @@ def sidecar_chat(body: dict = Body(...)):
                 "x-freshcheck-fresh": str(fc["fresh"]),
                 "x-freshcheck-stale": str(fc["stale"]),
                 "x-freshcheck-unclear": str(fc["unclear"]),
-                "x-freshcheck-status": "stale-found" if fc["stale"] else "ok",
+                "x-freshcheck-status": (
+                    "possible-stale-suggestion" if fc["stale"]
+                    else "needs-review" if fc["unclear"] or not fc["claims"]
+                    else "no-stale-suggestion"
+                ),
             }
     except Exception:
         headers = {"x-freshcheck-status": "error"}
@@ -239,7 +246,7 @@ def _mcp_check(text):
 @app.post("/mcp")
 def mcp_endpoint(body: Any = Body(...)):
     if isinstance(body, list):                       # JSON-RPC batch (older protocol revisions)
-        out = [r for r in (handle_rpc(m, _mcp_check) for m in body) if r is not None]
+        out = handle_batch(body, _mcp_check)
         return JSONResponse(content=out) if out else Response(status_code=202)
     resp = handle_rpc(body, _mcp_check)
     if resp is None:                                 # notification: accepted, no body

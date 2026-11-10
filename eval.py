@@ -1,14 +1,6 @@
-"""FreshCheck accuracy test: ~12 jawab-pata-wale claims par check karta hai ki
-system sahi verdict deta hai ya nahi. Result `eval_report.md` mein save hota hai
-(README mein "tested on N claims, X% correct" likhne ke kaam aata hai).
-
-Chalao:   py eval.py          (server + Bifrost chalu hone chahiye)
-Credits:  lagbhag 2-3 Tavily credits per case (total ~30-40).
-
-DHYAN: expected verdicts duniya ki 2026 ki sthiti ke hisaab se hain.
-Agar koi fact badal gaya ho to us line ka `expect` khud badal do.
-  stale = purana hona chahiye | fresh = sahi hona chahiye | none = koi stale nahi aana chahiye
-"""
+"""Run a small, hand-selected expected-label smoke check; this is not an accuracy benchmark.
+The report records whether this run's labels matched the script's expected-label rules.
+Live requests use configured provider and Tavily quota."""
 import sys, time, datetime
 import requests
 
@@ -35,12 +27,12 @@ def verdicts(d):
     return [c["verdict"] for c in d["claims"]]
 
 
-def passed(expect, v):
-    if expect == "stale":
-        return "stale" in v
-    if expect == "fresh":
-        return "stale" not in v and "fresh" in v
-    return "stale" not in v  # none
+def matches_expected_label(expect, v):
+    if expect in ("stale", "fresh"):
+        return v == [expect]
+    if expect == "none":
+        return not v
+    return False
 
 
 def main():
@@ -50,11 +42,11 @@ def main():
         print("FreshCheck server nahi mila. Pehle: py -m uvicorn server:app --reload")
         sys.exit(1)
     if not h["gateway_ok"]:
-        print("Gateway offline hai. Bifrost chalao.")
+        print("Configured LLM endpoint is not reachable at its configured URL.")
         sys.exit(1)
 
-    rows, ok = [], 0
-    print(f"{'Case':<18} {'Expect':<7} {'Got':<28} Result")
+    rows, matched = [], 0
+    print(f"{'Case':<18} {'Expected':<7} {'Got':<28} Match")
     print("-" * 66)
     for label, text, expect in CASES:
         try:
@@ -62,29 +54,28 @@ def main():
             if r.status_code != 200:
                 raise RuntimeError(r.json().get("detail", r.text)[:80])
             v = verdicts(r.json())
-            good = passed(expect, v)
+            good = matches_expected_label(expect, v)
             got = ",".join(v) or "(no claims)"
         except Exception as e:
             good, got = False, "ERROR " + str(e)[:40]
-        ok += good
+        matched += good
         rows.append((label, expect, got, good, text))
-        print(f"{label:<18} {expect:<7} {got:<28} {'PASS' if good else 'FAIL'}")
+        print(f"{label:<18} {expect:<7} {got:<28} {'MATCH' if good else 'MISMATCH'}")
         time.sleep(0.5)
 
-    pct = round(100 * ok / len(CASES))
     print("-" * 66)
-    print(f"Accuracy: {ok}/{len(CASES)} = {pct}%")
+    print(f"Expected-label matches: {matched}/{len(CASES)} selected cases (not an accuracy estimate)")
 
     with open("eval_report.md", "w", encoding="utf-8") as f:
-        f.write(f"# FreshCheck evaluation\n\nDate: {datetime.date.today()}  |  Gateway: {h['gateway']}  |  Model: {h['model']}\n\n")
-        f.write(f"**{ok}/{len(CASES)} cases correct ({pct}%)**\n\n")
+        f.write(f"# FreshCheck selected-case smoke run\n\nDate: {datetime.date.today()}  |  Provider: {h['gateway']}  |  Model: {h['model']}\n\n")
+        f.write(f"**{matched}/{len(CASES)} rows matched the script’s expected-label checks in this run. This is not an accuracy estimate or benchmark.**\n\n")
         f.write("| Case | Expected | Got | Result |\n|---|---|---|---|\n")
         for label, expect, got, good, text in rows:
-            f.write(f"| {label} | {expect} | {got} | {'PASS' if good else 'FAIL'} |\n")
-        f.write("\nCases are single-sentence claims with known answers. `stale` = must be flagged outdated, "
-                "`fresh` = must be confirmed current, `none` = must not be flagged.\n")
+            f.write(f"| {label} | {expect} | {got} | {'MATCH' if good else 'MISMATCH'} |\n")
+        f.write("\nThe hand-selected cases and expected labels are a narrow smoke check, not a representative sample. "
+                "A match does not prove a claim true, current, or correctly interpreted.\n")
     print("Report saved: eval_report.md")
-    print("FAIL aaye to us sentence ko website par chalake dekho, aur mujhe bhejo.")
+    print("Review any mismatches manually; this selected smoke run is not a benchmark.")
 
 
 if __name__ == "__main__":
